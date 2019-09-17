@@ -2,9 +2,9 @@ package types
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/polaris-backend/polaris-common/core/consts"
-	"gitea.bjx.cloud/allstar/polaris-backend/polaris-common/core/utils/copyer"
-	"gitea.bjx.cloud/allstar/polaris-backend/polaris-common/core/utils/json"
+	"gitea.bjx.cloud/allstar/common/core/consts"
+	"gitea.bjx.cloud/allstar/common/core/util/copyer"
+	"gitea.bjx.cloud/allstar/common/core/util/json"
 	"testing"
 	"time"
 )

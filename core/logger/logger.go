@@ -204,9 +204,6 @@ func (s *SysLogger) Init() {
 }
 
 func (s *SysLogger) InitLogger() *SysLogger {
-
-	fmt.Println(s.name)
-
 	logConfig := config.GetLogConfig(s.name)
 	if logConfig == nil {
 		panic(s.name + " log config not exist!")
@@ -236,9 +233,6 @@ func (s *SysLogger) InitLogger() *SysLogger {
 
 	if logConfig.EnableKafka == true {
 		s.kafkaTopic = strings.Replace(logConfig.KafkaTopic, ":appName:", config.GetApplication().Name, -1)
-
-		fmt.Println(logConfig.KafkaTopic)
-		fmt.Println(s.kafkaTopic)
 
 		//设置日志输入到Kafka的配置
 		kafkaConfig := sarama.NewConfig()

@@ -123,7 +123,7 @@ func (rocketMQProxy *Proxy) SendMessage(messages ...*model.MqMessage) (*[]model.
 	return &msgExts, nil
 }
 
-func (rocketMQProxy *Proxy) ConsumePushMessage(topic string, groupId string, fu func(message *mq.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
+func (rocketMQProxy *Proxy) ConsumePushMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
 
 	err := rocketMQProxy.initConsumer(groupId)
 	if err != nil {

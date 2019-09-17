@@ -3,13 +3,13 @@ package kafka
 import (
 	"context"
 	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/library/mq"
+	"gitea.bjx.cloud/allstar/common/core/model"
 	"github.com/Shopify/sarama"
 	"strings"
 )
 
 type exampleConsumerGroupHandler struct {
-	fu func(message *mq.MqMessageExt) errors.SystemErrorInfo
+	fu func(message *model.MqMessageExt) errors.SystemErrorInfo
 }
 
 func (exampleConsumerGroupHandler) Setup(s sarama.ConsumerGroupSession) error {
@@ -26,8 +26,8 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 	select {
 	case msg := <-claim.Messages():
 		if msg != nil {
-			msgExt := &mq.MqMessageExt{
-				MqMessage: mq.MqMessage{
+			msgExt := &model.MqMessageExt{
+				MqMessage: model.MqMessage{
 					Topic:     msg.Topic,
 					Body:      string(msg.Value),
 					Keys:      string(msg.Key),
@@ -50,7 +50,7 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 	return nil
 }
 
-func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message *mq.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
+func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
 	kafkaConfig := getKafkaConfig()
 	log.Infof("Starting a new Sarama consumer, topic %s, groupId %s", topic, groupId)
 
