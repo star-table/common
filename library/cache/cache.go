@@ -8,7 +8,6 @@ import (
 	"sync"
 )
 
-
 type Cache interface {
 	Set(key string, value string) error
 	SetEx(key string, value string, second int64) error
