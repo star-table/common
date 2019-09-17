@@ -2,8 +2,6 @@ package dingtalk
 
 import (
 	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/library/cache"
 	"github.com/pkg/errors"
 	"github.com/polaris-team/dingtalk-sdk-golang/sdk"
 	"os"
@@ -44,14 +42,6 @@ func GetSDKProxy() *sdk.DingTalkSDK {
 func GetCrypto() *sdk.Crypto {
 	initSDK()
 	return dingTalkSDK.CreateCrypto()
-}
-
-func GetDingTalkClientRest(corpId string) (*sdk.DingTalkClient, error) {
-	suiteTicket, err := GetSuiteTicket()
-	if err != nil {
-		return nil, err
-	}
-	return GetDingTalkClient(corpId, suiteTicket)
 }
 
 func GetDingTalkClient(corpId string, suiteTicket string) (*sdk.DingTalkClient, error) {
@@ -95,6 +85,4 @@ func NewDingTalkClient(accessToken string, agentId int64) *sdk.DingTalkClient {
 	}
 }
 
-func GetSuiteTicket() (string, error) {
-	return cache.Get(consts.CacheSuiteTicketKey)
-}
+
