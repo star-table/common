@@ -1,4 +1,4 @@
-package _map
+package maps
 
 import (
 	"gitea.bjx.cloud/allstar/common/core/util/json"
