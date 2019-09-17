@@ -32,6 +32,8 @@ type SystemErrorInfo interface {
 	Equal(error) bool
 }
 
+
+
 func (sei ResultCodeInfo) Error() string {
 	return "{\"code\":" + strconv.Itoa(sei.code) + ",\"message\":\"" + sei.message + "\"}"
 }
@@ -46,6 +48,18 @@ func (sei ResultCodeInfo) Message() string {
 
 func (sei ResultCodeInfo) LangCode() string {
 	return sei.langCode
+}
+
+func (sei *ResultCodeInfo) SetCode(code int) {
+	sei.code = code
+}
+
+func (sei *ResultCodeInfo) SetMessage(message string) {
+	sei.message = message
+}
+
+func (sei *ResultCodeInfo) SetLangCode(langCode string) {
+	sei.langCode = langCode
 }
 
 func (sei ResultCodeInfo) Equal(err error) bool {
