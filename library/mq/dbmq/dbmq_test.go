@@ -7,6 +7,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/model"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func pushMsg(message *model.MqMessageExt) errors.SystemErrorInfo {
@@ -21,7 +22,7 @@ func pushMsg(message *model.MqMessageExt) errors.SystemErrorInfo {
 
 func TestGetDbMQProxy(t *testing.T) {
 
-	config.LoadConfig("F:\\workspace-golang-polaris\\polaris-backend\\polaris-server\\config", "application")
+	config.LoadUnitTestConfig()
 
 	for i := 0; i < 10 ; i++ {
 
@@ -39,7 +40,8 @@ func TestGetDbMQProxy(t *testing.T) {
 		fmt.Println(err)
 	}
 
-	err := GetDbMQProxy().ConsumeMessage("test_test_topic", "consumer1", pushMsg)
-	fmt.Println(err)
+	go GetDbMQProxy().ConsumeMessage("test_test_topic", "consumer1", pushMsg)
+
+	time.Sleep(time.Duration(3) * time.Second)
 
 }

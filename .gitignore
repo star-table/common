@@ -83,3 +83,4 @@ _test
 /target
 
 .scannerwork
+/*.out

@@ -11,7 +11,7 @@ import (
 func TestSignUrlWithStream(t *testing.T) {
 
 	keyname := "test/hello5.jpg"
-	config.LoadLocalConfig()
+	config.LoadUnitTestConfig()
 
 	signUrl, _ := SignUrlWithStream(keyname, "png", 60)
 

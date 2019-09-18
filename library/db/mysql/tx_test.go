@@ -8,7 +8,7 @@ import (
 )
 
 func TestTransX(t *testing.T) {
-	config.LoadConfig("F:\\polaris-backend\\polaris-server\\config", "application")
+	config.LoadUnitTestConfig()
 	a := []int64{1}
 	TransX(func(tx sqlbuilder.Tx) error {
 		a = append(a, 2)

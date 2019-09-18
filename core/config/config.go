@@ -1,10 +1,12 @@
 package config
 
 import (
+	"flag"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"os"
+	"strings"
 )
 
 var conf Config = Config{
@@ -248,6 +250,29 @@ func GetParameters() *ParameterConfig {
 
 func LoadConfig(dir string, config string) error {
 	return LoadEnvConfig(dir, config, "")
+}
+
+func LoadUnitTestConfig(){
+	configPath := ""
+	configName := ""
+	for _, arg := range flag.Args() {
+		argList := strings.Split(arg, "=")
+		if len(argList) != 2 {
+			argList = strings.Split(arg, " ")
+		}
+		if len(argList) != 2 {
+			fmt.Printf(" unknown arg:%v\n", arg)
+			continue
+		}
+		arg0 := strings.TrimSpace(argList[0])
+		if arg0 == "c" || arg0 == "C" {
+			configPath = argList[1]
+		}
+		if arg0 == "n" || arg0 == "N" {
+			configName = argList[1]
+		}
+	}
+	LoadConfig(configPath, configName)
 }
 
 func LoadEnvConfig(dir string, config string, env string) error {

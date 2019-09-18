@@ -27,7 +27,7 @@ import (
 //}
 
 func TestLogger(m *testing.T) {
-	config.LoadLocalConfig()
+	config.LoadUnitTestConfig()
 
 	var log = GetDefaultLogger()
 

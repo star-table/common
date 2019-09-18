@@ -7,7 +7,7 @@ import (
 
 func TestAvailability(t *testing.T) {
 	t.Logf("start load config")
-	config.LoadConfig("F:\\workspace-golang-polaris\\polaris-backend\\polaris-testing\\configs", "application")
+	config.LoadUnitTestConfig()
 
 	err := SendMail([]string{"ainililia@163.com"}, "hello", "hello")
 	if err == nil {

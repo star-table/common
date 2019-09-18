@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetESClient(t *testing.T) {
-	config.LoadTreeConfig()
+	config.LoadUnitTestConfig()
 
 	client, err := GetESClient()
 	fmt.Println(err)

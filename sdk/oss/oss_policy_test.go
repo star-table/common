@@ -8,7 +8,7 @@ import (
 
 func TestPostPolicy(t *testing.T) {
 
-	config.LoadLocalConfig()
+	config.LoadUnitTestConfig()
 	pp := PostPolicy("project", 1000*60*5, 0)
 	t.Log(json.ToJson(pp))
 }

@@ -6,7 +6,7 @@ import (
 )
 
 func TestSelectByQuery(t *testing.T) {
-	config.LoadConfig("F:\\workspace-test\\polaris-backend\\polaris-server\\configs", "application")
+	config.LoadUnitTestConfig()
 
 	//s := &[]domains.PpmProProjectRelation{}
 	s := &[]int64{}
