@@ -266,7 +266,7 @@ func LoadUnitTestConfig(){
 			continue
 		}
 		arg0 := strings.TrimSpace(argList[0])
-		if arg0 == "c" || arg0 == "C" {
+		if arg0 == "p" || arg0 == "P" {
 			configPath = argList[1]
 		}
 		if arg0 == "n" || arg0 == "N" {
