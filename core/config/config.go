@@ -255,6 +255,7 @@ func LoadConfig(dir string, config string) error {
 func LoadUnitTestConfig(){
 	configPath := ""
 	configName := ""
+	env := ""
 	for _, arg := range flag.Args() {
 		argList := strings.Split(arg, "=")
 		if len(argList) != 2 {
@@ -271,8 +272,11 @@ func LoadUnitTestConfig(){
 		if arg0 == "n" || arg0 == "N" {
 			configName = argList[1]
 		}
+		if arg0 == "e" || arg0 == "E" {
+			env = argList[1]
+		}
 	}
-	LoadConfig(configPath, configName)
+	LoadEnvConfig(configPath, configName, env)
 }
 
 func LoadEnvConfig(dir string, config string, env string) error {

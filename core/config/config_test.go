@@ -10,11 +10,11 @@ import (
 /**
 加载本地配置
 */
-func TestLoadLocalConfig(t *testing.T) {
+func TestLoadUnitTestConfig2(t *testing.T) {
 
 	convey.Convey("Test LoadLocalConfig", t, func() {
 		convey.Convey("test", func() {
-			LoadLocalConfig()
+			LoadUnitTestConfig()
 		})
 	})
 
@@ -97,16 +97,6 @@ func TestGetMailConfig(t *testing.T) {
 	})
 }
 
-/**
-添加LoadConfig的单元测试
-*/
-func TestLoadConfig(t *testing.T) {
-
-	convey.Convey("Test LoadConfig", t, func() {
-
-		convey.So(LoadConfig(), convey.ShouldNotBeNil)
-	})
-}
 
 /**
 添加GetServerConfig的单元测试
