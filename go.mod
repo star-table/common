@@ -1,6 +1,6 @@
 module gitea.bjx.cloud/allstar/common
 
-go 1.12
+go 1.13
 
 require (
 	github.com/Shopify/sarama v1.23.1
@@ -27,6 +27,7 @@ require (
 	golang.org/x/net v0.0.0-20190916140828-c8589233b77d // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
+	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	upper.io/db.v3 v3.5.7+incompatible
 )
