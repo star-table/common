@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/Shopify/sarama v1.23.1
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.1+incompatible
-	github.com/apache/rocketmq-client-go v0.0.0-20190915102151-ba3a8e36af7e // indirect
+	github.com/apache/rocketmq-client-go v0.0.0-20190915102151-ba3a8e36af7e
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/bytedance/go-tagexpr v2.2.0+incompatible
