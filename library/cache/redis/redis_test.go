@@ -5,6 +5,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/config"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestAvailability(t *testing.T) {
@@ -41,4 +42,21 @@ func TestProxy_TryGetDistributedLock(t *testing.T) {
 	for i := 1; i < 100; i++ {
 		fmt.Println(rand.Int31n(30))
 	}
+}
+
+func Test_Pool(t *testing.T){
+	config.LoadConfig("F:\\workspace-golang-polaris\\polaris-backend\\config", "application")
+	for i := 0; i < 1000; i ++{
+		go getConn()
+	}
+	fmt.Print("阻塞")
+
+	time.Sleep(time.Duration(10) * time.Second)
+}
+
+func getConn(){
+	conn := GetRedisConn()
+	time.Sleep(time.Duration(1) * time.Second)
+
+	conn.Close()
 }

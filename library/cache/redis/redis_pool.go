@@ -2,6 +2,7 @@ package redis
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -64,13 +65,14 @@ func initRedisPool() {
 	}
 }
 
-func GetRedisConn() (redis.Conn, error) {
+func GetRedisConn() redis.Conn {
 	if redisClient == nil {
+
 		poolMutex.Lock()
 		defer poolMutex.Unlock()
 		if redisClient == nil {
 			initRedisPool()
 		}
 	}
-	return redisClient.Dial()
+	return redisClient.Get()
 }

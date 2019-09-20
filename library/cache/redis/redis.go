@@ -191,11 +191,12 @@ func (rp *Proxy) ReleaseDistributedLock(key string, v string) (bool, error) {
 }
 
 func Connect() (redis.Conn, error) {
-	return GetRedisConn()
+	return GetRedisConn(), nil
 }
 
 func Close(conn redis.Conn) error {
 	if conn != nil && conn.Err() == nil {
+		conn.Close()
 		return conn.Close()
 	}
 	return nil

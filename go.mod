@@ -17,6 +17,7 @@ require (
 	github.com/mozillazg/go-pinyin v0.15.0
 	github.com/nyaruka/phonenumbers v1.0.43 // indirect
 	github.com/olivere/elastic/v7 v7.0.6
+	github.com/opentracing/opentracing-go v1.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/polaris-team/converter v0.0.8
 	github.com/polaris-team/dingtalk-sdk-golang v0.0.6
