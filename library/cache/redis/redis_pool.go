@@ -2,12 +2,11 @@ package redis
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/gomodule/redigo/redis"
 
 	"strconv"
 )
