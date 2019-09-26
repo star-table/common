@@ -310,4 +310,5 @@ func loadConfig(dir string, config string, env string) error{
 	if err := conf.Viper.Unmarshal(&conf); err != nil {
 		return err
 	}
+	return nil
 }
