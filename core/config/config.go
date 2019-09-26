@@ -86,6 +86,7 @@ type MailConfig struct {
 type ServerConfig struct {
 	Port int
 	Name string
+	Host string
 }
 
 type DingTalkSDKConfig struct {
