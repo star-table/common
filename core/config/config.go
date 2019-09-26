@@ -281,43 +281,33 @@ func LoadUnitTestConfig(){
 }
 
 func LoadEnvConfig(dir string, config string, env string) error {
-	//if env != "" {
-	//	config += env
-	//}
-	conf.Viper.SetConfigName(config)
+	err := loadConfig(dir, config, "")
+	if err != nil{
+		return err
+	}
+	if env != ""{
+		err = loadConfig(dir, config, env)
+		if err != nil{
+			return err
+		}
+	}
+	return nil
+}
+
+func loadConfig(dir string, config string, env string) error{
+	configName := config
+	if env != ""{
+		configName += "." + env
+	}
+	conf.Viper = viper.New()
+	conf.Viper.SetConfigName(configName)
 	conf.Viper.AddConfigPath(dir)
 	conf.Viper.SetConfigType("yaml")
 	if err := conf.Viper.ReadInConfig(); err != nil {
 		fmt.Println(err)
 		return err
 	}
-
-	if env == "" {
-		if err := conf.Viper.Unmarshal(&conf); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	configs := conf.Viper.AllSettings()
-	viper2 := viper.New()
-
-	// 将default中的配置全部以默认配置写入
-	for k, v := range configs {
-		viper2.SetDefault(k, v)
-	}
-
-	viper2.SetConfigName(config + "." + env)
-	viper2.AddConfigPath(dir)
-	viper2.SetConfigType("yaml")
-	if err := viper2.ReadInConfig(); err != nil {
-		return err
-	}
-	conf.Viper = viper2
 	if err := conf.Viper.Unmarshal(&conf); err != nil {
 		return err
 	}
-
-	return nil
 }
