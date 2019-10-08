@@ -112,6 +112,8 @@ type ApplicationConfig struct {
 	RunMode   int
 	CacheMode string
 	Name      string
+	ApiCode   string
+	ApiKey    string
 }
 
 type MQConfig struct {
@@ -158,6 +160,7 @@ type ParameterConfig struct {
 	IdBufferThreshold float64
 	MaxPageSize       int
 	EsIndex           *EsIndexConfig
+	PreUrl            map[string]string
 }
 
 type EsIndexConfig struct {
@@ -249,11 +252,18 @@ func GetParameters() *ParameterConfig {
 	return conf.Parameters
 }
 
+func getPreUrl(name string) string {
+	if v, ok := conf.Parameters.PreUrl[name]; ok {
+		return v
+	}
+	return ""
+}
+
 func LoadConfig(dir string, config string) error {
 	return LoadEnvConfig(dir, config, "")
 }
 
-func LoadUnitTestConfig(){
+func LoadUnitTestConfig() {
 	configPath := ""
 	configName := ""
 	env := ""
@@ -282,21 +292,21 @@ func LoadUnitTestConfig(){
 
 func LoadEnvConfig(dir string, config string, env string) error {
 	err := loadConfig(dir, config, "")
-	if err != nil{
+	if err != nil {
 		return err
 	}
-	if env != ""{
+	if env != "" {
 		err = loadConfig(dir, config, env)
-		if err != nil{
+		if err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func loadConfig(dir string, config string, env string) error{
+func loadConfig(dir string, config string, env string) error {
 	configName := config
-	if env != ""{
+	if env != "" {
 		configName += "." + env
 	}
 	conf.Viper = viper.New()
