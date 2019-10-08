@@ -252,7 +252,7 @@ func GetParameters() *ParameterConfig {
 	return conf.Parameters
 }
 
-func getPreUrl(name string) string {
+func GetPreUrl(name string) string {
 	if v, ok := conf.Parameters.PreUrl[name]; ok {
 		return v
 	}
