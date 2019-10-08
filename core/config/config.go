@@ -112,8 +112,8 @@ type ApplicationConfig struct {
 	RunMode   int
 	CacheMode string
 	Name      string
-	ApiCode   string
-	ApiKey    string
+	AppCode   string
+	AppKey    string
 }
 
 type MQConfig struct {
