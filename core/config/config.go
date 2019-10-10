@@ -68,6 +68,7 @@ type OSSConfig struct {
 type OSSPolicyConfig struct {
 	ProjectCover  OSSPolicyInfo
 	IssueResource OSSPolicyInfo
+	IssueInputFile OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
@@ -180,6 +181,10 @@ func GetProjectCoverPolicyConfig() OSSPolicyInfo {
 
 func GetIssueResourcePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.IssueResource
+}
+
+func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
+	return conf.OSS.Policies.IssueInputFile
 }
 
 func GetMysqlConfig() *MysqlConfig {
