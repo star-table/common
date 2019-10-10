@@ -138,6 +138,15 @@ func SelectAllByCond(table string, cond db.Cond, objs interface{}) error {
 	return nil
 }
 
+func TransSelectAllByCond(tx sqlbuilder.Tx, table string, cond db.Cond, objs interface{}) error {
+	err := tx.Collection(table).Find(cond).All(objs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func SelectAllByCondWithPageAndOrder(table string, cond db.Cond, union *db.Union, page int, size int, order interface{}, objs interface{}) (uint64, error) {
 	conn, err := GetConnect()
 	defer func() {
@@ -150,6 +159,28 @@ func SelectAllByCondWithPageAndOrder(table string, cond db.Cond, union *db.Union
 	}
 
 	mid := conn.Collection(table).Find(cond)
+	if union != nil {
+		mid = mid.And(union)
+	}
+	if size > 0 && page > 0 {
+		mid = mid.Page(uint(page)).Paginate(uint(size))
+	}
+	if order != nil && order != "" {
+		mid = mid.OrderBy(order)
+	}
+	count, err := mid.TotalEntries()
+	if err != nil {
+		return 0, err
+	}
+	err = mid.All(objs)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func TransSelectAllByCondWithPageAndOrder(tx sqlbuilder.Tx, table string, cond db.Cond, union *db.Union, page int, size int, order interface{}, objs interface{}) (uint64, error) {
+	mid := tx.Collection(table).Find(cond)
 	if union != nil {
 		mid = mid.And(union)
 	}
@@ -192,6 +223,24 @@ func SelectAllByCondWithNumAndOrder(table string, cond db.Cond, union *db.Union,
 		mid = mid.OrderBy(order)
 	}
 	err = mid.All(objs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func TransSelectAllByCondWithNumAndOrder(tx sqlbuilder.Tx, table string, cond db.Cond, union *db.Union, page int, size int, order interface{}, objs interface{}) error {
+	mid := tx.Collection(table).Find(cond)
+	if union != nil {
+		mid = mid.And(union)
+	}
+	if size > 0 && page > 0 {
+		mid = mid.Page(uint(page)).Paginate(uint(size))
+	}
+	if order != nil && order != "" {
+		mid = mid.OrderBy(order)
+	}
+	err := mid.All(objs)
 	if err != nil {
 		return err
 	}
