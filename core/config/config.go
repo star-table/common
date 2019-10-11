@@ -22,6 +22,7 @@ var conf Config = Config{
 	Mq:            nil,
 	OSS:           nil,
 	ElasticSearch: nil,
+	Sentry:		   nil,
 }
 
 type Config struct {
@@ -37,6 +38,7 @@ type Config struct {
 	Mq            *MQConfig
 	OSS           *OSSConfig
 	ElasticSearch *ElasticSearchConfig
+	Sentry		  *SentryConfig
 }
 
 type MysqlConfig struct {
@@ -88,6 +90,10 @@ type ServerConfig struct {
 	Port int
 	Name string
 	Host string
+}
+
+type SentryConfig struct {
+	Dsn string
 }
 
 type DingTalkSDKConfig struct {
@@ -190,6 +196,10 @@ func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.IssueInputFile
 }
 
+func GetSentryConfig() *SentryConfig{
+	return conf.Sentry
+}
+
 func GetMysqlConfig() *MysqlConfig {
 	return conf.Mysql
 }
@@ -268,6 +278,10 @@ func LoadConfig(dir string, config string) error {
 	return LoadEnvConfig(dir, config, "")
 }
 
+func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
+	return LoadExtraEnvConfig(dir, config, "", extraConfig)
+}
+
 func LoadUnitTestConfig() {
 	configPath := ""
 	configName := ""
@@ -308,6 +322,32 @@ func LoadEnvConfig(dir string, config string, env string) error {
 	}
 	return nil
 }
+
+func LoadExtraEnvConfig(dir string, config string, env string, extraConfig interface{}) error {
+	err := loadExtraConfig(dir, config, "", extraConfig)
+	if err != nil {
+		return err
+	}
+	if env != "" {
+		err = loadExtraConfig(dir, config, env, extraConfig)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func loadExtraConfig(dir string, config string, env string, extraConfig interface{}) error {
+	err := loadConfig(dir, config, env)
+	if err != nil{
+		return err
+	}
+	if err := conf.Viper.Unmarshal(&extraConfig); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func loadConfig(dir string, config string, env string) error {
 	configName := config
