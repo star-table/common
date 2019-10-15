@@ -15,7 +15,7 @@ type MQClient interface {
 }
 
 var (
-	kafkaClient	   MQClient = kafka.NewKafkaProxy()
+	kafkaClient	   MQClient = &kafka.Proxy{}
 	dbMqClient		MQClient = &dbmq.DbMQProxy{}
 )
 

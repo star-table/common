@@ -17,10 +17,6 @@ import (
 type Proxy struct {
 	//key: topic + partitioner
 	producers map[string]sarama.AsyncProducer
-	//消费重试次数
-	ReconsumeTimes int
-	//推送重试次数
-	RePushTimes int
 }
 
 var(
@@ -42,14 +38,6 @@ func init(){
 	producerConfig.Producer.Return.Successes = true
 	producerConfig.Producer.Return.Errors = true
 	producerConfig.Version = version
-}
-
-func NewKafkaProxy() *Proxy{
-	kafkaConfig := config.GetKafkaConfig()
-	return &Proxy{
-		ReconsumeTimes: kafkaConfig.ReconsumeTimes,
-		RePushTimes: kafkaConfig.RePushTimes,
-	}
 }
 
 type MsgMetadata struct {
@@ -135,18 +123,14 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 	msgExts := make([]model.MqMessageExt, len(messages))
 	for i, message := range messages{
 		//传递metadata，方便消费端重试
-		msgMetadata := MsgMetadata{
-			ReconsumeTimes: proxy.ReconsumeTimes,
-			RePushTimes: proxy.RePushTimes,
-		}
+		ReconsumeTimes := config.GetKafkaConfig().ReconsumeTimes
+		RePushTimes := config.GetKafkaConfig().RePushTimes
 		if message.ReconsumeTimes != nil{
-			msgMetadata.ReconsumeTimes = *message.ReconsumeTimes
+			ReconsumeTimes = *message.ReconsumeTimes
 		}
 		if message.RePushTimes != nil{
-			msgMetadata.RePushTimes = *message.RePushTimes
+			RePushTimes = *message.RePushTimes
 		}
-
-		log.Infof(strconv.Itoa(int(msgMetadata.ReconsumeTimes)))
 
 		key := uuid.NewUuid()
 		// send message
@@ -158,7 +142,7 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 			Headers: []sarama.RecordHeader{
 				{
 					Key: []byte(RecordHeaderReconsumeTimes),
-					Value: []byte(strconv.Itoa(int(msgMetadata.ReconsumeTimes))),
+					Value: []byte(strconv.Itoa(ReconsumeTimes)),
 				},
 			},
 		}
@@ -170,7 +154,7 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 		producer := *p
 
 		var pushErr error = nil
-		for rePushTime := int(0); rePushTime <= msgMetadata.RePushTimes; rePushTime ++{
+		for rePushTime := int(0); rePushTime <= RePushTimes; rePushTime ++{
 			if rePushTime > 0{
 				log.Infof("重试次数%d，最大次数%d, 上次失败原因%v, 消息内容%s", rePushTime, message.RePushTimes, pushErr, json.ToJsonIgnoreError(message))
 			}
