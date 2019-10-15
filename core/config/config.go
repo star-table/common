@@ -39,6 +39,7 @@ type Config struct {
 	OSS           *OSSConfig
 	ElasticSearch *ElasticSearchConfig
 	Sentry		  *SentryConfig
+	SkyWalking 	  *SkyWalkingConfig
 }
 
 type MysqlConfig struct {
@@ -96,6 +97,10 @@ type SentryConfig struct {
 	Dsn string
 }
 
+type SkyWalkingConfig struct {
+	ReportAddress string
+}
+
 type DingTalkSDKConfig struct {
 	SuiteKey    string
 	SuiteSecret string
@@ -139,6 +144,8 @@ type RocketMQConfig struct {
 //KafKa MQ Config
 type KafkaMQConfig struct {
 	NameServers string
+	ReconsumeTimes int
+	RePushTimes int
 }
 
 type TopicConfig struct {
@@ -198,6 +205,10 @@ func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
 
 func GetSentryConfig() *SentryConfig{
 	return conf.Sentry
+}
+
+func GetSkyWalkingConfig() *SkyWalkingConfig{
+	return conf.SkyWalking
 }
 
 func GetMysqlConfig() *MysqlConfig {
@@ -283,9 +294,9 @@ func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
 }
 
 func LoadUnitTestConfig() {
-	configPath := ""
-	configName := ""
-	env := ""
+	configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
+	configName := "application.common"
+	env := "local"
 	for _, arg := range flag.Args() {
 		argList := strings.Split(arg, "=")
 		if len(argList) != 2 {

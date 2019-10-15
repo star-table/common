@@ -11,11 +11,11 @@ import (
 
 type MQClient interface {
 	PushMessage(messages ...*model.MqMessage) (*[]model.MqMessageExt, errors.SystemErrorInfo)
-	ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo
+	ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo, errCallback func(message *model.MqMessageExt)) errors.SystemErrorInfo
 }
 
 var (
-	kafkaClient	   MQClient = &kafka.Proxy{}
+	kafkaClient	   MQClient = kafka.NewKafkaProxy()
 	dbMqClient		MQClient = &dbmq.DbMQProxy{}
 )
 

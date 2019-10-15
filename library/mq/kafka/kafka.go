@@ -11,11 +11,16 @@ import (
 	"github.com/Shopify/sarama"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Proxy struct {
 	//key: topic + partitioner
 	producers map[string]sarama.AsyncProducer
+	//消费重试次数
+	ReconsumeTimes int
+	//推送重试次数
+	RePushTimes int
 }
 
 var(
@@ -23,6 +28,11 @@ var(
 	version = sarama.V2_3_0_0
 
 	producerConfig = sarama.NewConfig()
+)
+
+const(
+	RecordHeaderReconsumeTimes = "ReconsumeTimes"
+	RecordHeaderRePushTimes = "RePushTimes"
 )
 
 func init(){
@@ -34,6 +44,20 @@ func init(){
 	producerConfig.Version = version
 }
 
+func NewKafkaProxy() *Proxy{
+	kafkaConfig := config.GetKafkaConfig()
+	return &Proxy{
+		ReconsumeTimes: kafkaConfig.ReconsumeTimes,
+		RePushTimes: kafkaConfig.RePushTimes,
+	}
+}
+
+type MsgMetadata struct {
+	//消费重试次数
+	ReconsumeTimes int
+	//推送重试次数
+	RePushTimes int
+}
 
 func getKafkaConfig() *config.KafkaMQConfig{
 	return config.GetKafkaConfig()
@@ -110,6 +134,19 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 
 	msgExts := make([]model.MqMessageExt, len(messages))
 	for i, message := range messages{
+		//传递metadata，方便消费端重试
+		msgMetadata := MsgMetadata{
+			ReconsumeTimes: proxy.ReconsumeTimes,
+			RePushTimes: proxy.RePushTimes,
+		}
+		if message.ReconsumeTimes != nil{
+			msgMetadata.ReconsumeTimes = *message.ReconsumeTimes
+		}
+		if message.RePushTimes != nil{
+			msgMetadata.RePushTimes = *message.RePushTimes
+		}
+
+		log.Infof(strconv.Itoa(int(msgMetadata.ReconsumeTimes)))
 
 		key := uuid.NewUuid()
 		// send message
@@ -118,6 +155,12 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 			Partition: message.Partition,
 			Key:   sarama.StringEncoder(key),
 			Value: sarama.ByteEncoder(message.Body),
+			Headers: []sarama.RecordHeader{
+				{
+					Key: []byte(RecordHeaderReconsumeTimes),
+					Value: []byte(strconv.Itoa(int(msgMetadata.ReconsumeTimes))),
+				},
+			},
 		}
 		p, err1 := proxy.getProducerAutoConnect(message.Topic, message.Partition)
 		if err1 != nil{
@@ -126,14 +169,32 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 		}
 		producer := *p
 
-		producer.Input() <- msg
-		select {
-		case suc := <-producer.Successes():
-			log.Infof("offset: %d,  timestamp: %s", suc.Offset, suc.Timestamp.String())
-		case fail := <-producer.Errors():
-			log.Errorf("err: %s\n", fail.Err.Error())
-			return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, fail)
+		var pushErr error = nil
+		for rePushTime := int(0); rePushTime <= msgMetadata.RePushTimes; rePushTime ++{
+			if rePushTime > 0{
+				log.Infof("重试次数%d，最大次数%d, 上次失败原因%v, 消息内容%s", rePushTime, message.RePushTimes, pushErr, json.ToJsonIgnoreError(message))
+			}
+			producer.Input() <- msg
+			select {
+			case suc := <-producer.Successes():
+				log.Infof("推送成功, offset: %d,  timestamp: %s， 消息内容%s", suc.Offset, suc.Timestamp.String(), json.ToJsonIgnoreError(message))
+				pushErr = nil
+			case fail := <-producer.Errors():
+				log.Errorf("err: %s\n", fail.Err.Error())
+				pushErr = fail
+				//return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, fail)
+				time.Sleep(time.Duration(5) * time.Second)
+			}
+			if pushErr == nil{
+				break
+			}
 		}
+		if pushErr != nil{
+			//最终推送失败，记log
+			log.Errorf("消息推送失败，无重试次数，消息内容：%s", json.ToJsonIgnoreError(message))
+			return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, pushErr)
+		}
+
 		msgExts[i] = model.MqMessageExt{
 			MqMessage: model.MqMessage{
 				Topic: msg.Topic,

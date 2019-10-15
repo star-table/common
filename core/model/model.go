@@ -80,6 +80,11 @@ type MqMessage struct {
 	 */
 	Property map[string]string
 
+	//消费重试次数
+	ReconsumeTimes *int
+	//推送重试次数
+	RePushTimes *int
+
 
 	//Kafka特有
 	Partition int32

@@ -23,8 +23,6 @@ var (
 	maxRetryCount = 6
 )
 
-
-
 type DbMQProxy struct{}
 
 func (dbMqProxy *DbMQProxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessageExt, errors.SystemErrorInfo) {
@@ -76,7 +74,7 @@ func (dbMqProxy *DbMQProxy) PushMessage(messages ...*model.MqMessage) (*[]model.
 	return &msgExts, nil
 }
 
-func (dbMqProxy *DbMQProxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
+func (dbMqProxy *DbMQProxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo, errCallback func(message *model.MqMessageExt)) errors.SystemErrorInfo {
 
 	consumer, err := getTopicConsumer(topic, groupId)
 	if err != nil {

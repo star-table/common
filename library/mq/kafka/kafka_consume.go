@@ -4,12 +4,16 @@ import (
 	"context"
 	"gitea.bjx.cloud/allstar/common/core/errors"
 	"gitea.bjx.cloud/allstar/common/core/model"
+	"gitea.bjx.cloud/allstar/common/core/util/json"
 	"github.com/Shopify/sarama"
+	"strconv"
 	"strings"
 )
 
 type exampleConsumerGroupHandler struct {
 	fu func(message *model.MqMessageExt) errors.SystemErrorInfo
+	errCallback func(message *model.MqMessageExt)
+	proxy *Proxy
 }
 
 func (exampleConsumerGroupHandler) Setup(s sarama.ConsumerGroupSession) error {
@@ -26,6 +30,18 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 	select {
 	case msg := <-claim.Messages():
 		if msg != nil {
+			//获取重试次数
+			ReconsumeTimes := int(0)
+			if msg.Headers != nil{
+				for _, header := range msg.Headers{
+					if string(header.Key) == RecordHeaderReconsumeTimes{
+						v, _ := strconv.ParseInt(string(header.Value), 10, 32)
+						ReconsumeTimes = int(v)
+					}
+				}
+			}
+			afterConsumerTimes := ReconsumeTimes - 1
+
 			msgExt := &model.MqMessageExt{
 				MqMessage: model.MqMessage{
 					Topic:     msg.Topic,
@@ -33,15 +49,28 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 					Keys:      string(msg.Key),
 					Partition: msg.Partition,
 					Offset:    msg.Offset,
+					ReconsumeTimes: &afterConsumerTimes,
 				},
 			}
 			err1 := h.fu(msgExt)
 			if err1 != nil {
 				log.Errorf("Kafka 业务消费异常 %v", err1)
-				log.Errorf("Topic: %s, 处理失败的消息：%s ", msg.Topic, string(msg.Value))
+				log.Errorf("Topic: %s, 处理失败的消息：%s ", msg.Topic, json.ToJsonIgnoreError(msgExt.MqMessage))
+				sess.MarkMessage(msg, "consumer err")
+
+				log.Infof("剩余消费次数%d", afterConsumerTimes)
+				if afterConsumerTimes > -1{
+					_, pushErr := h.proxy.PushMessage(&msgExt.MqMessage)
+					if pushErr != nil{
+						log.Errorf("重试推送失败, 消息内容:%s",json.ToJsonIgnoreError(msgExt.MqMessage))
+					}
+				}else{
+					log.Errorf("无重试次数, 消息最终消费失败, 消息内容%s", json.ToJsonIgnoreError(msgExt.MqMessage))
+					h.errCallback(msgExt)
+				}
 			} else {
 				//暂时自动提交，之后考虑嵌入的自定义方法中
-				sess.MarkMessage(msg, "")
+				sess.MarkMessage(msg, "successful")
 			}
 		}
 	}
@@ -50,7 +79,7 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 	return nil
 }
 
-func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo) errors.SystemErrorInfo {
+func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo, errCallback func(message *model.MqMessageExt)) errors.SystemErrorInfo {
 	kafkaConfig := getKafkaConfig()
 	log.Infof("Starting a new Sarama consumer, topic %s, groupId %s", topic, groupId)
 
@@ -62,7 +91,6 @@ func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message
 	topics := []string{topic}
 	ctx, _ := context.WithCancel(context.Background())
 	client, err := sarama.NewConsumerGroup(strings.Split(kafkaConfig.NameServers, ","), groupId, config)
-
 	if err != nil {
 		log.Errorf("Error creating consumer group client: %v", err)
 		return errors.BuildSystemErrorInfo(errors.KafkaMqConsumeStartError)
@@ -70,10 +98,11 @@ func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message
 
 	handler := exampleConsumerGroupHandler{
 		fu: fu,
+		proxy: proxy,
+		errCallback: errCallback,
 	}
 	for {
 		//log.Infof("准备消费, topic %s, groupId %s", topic, groupId)
-
 		if err := client.Consume(ctx, topics, &handler); err != nil {
 			log.Errorf("Error from consumer: %v", err)
 		}
