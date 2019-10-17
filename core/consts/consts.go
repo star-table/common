@@ -5,7 +5,6 @@ import "time"
 //Token
 const AppHeaderTokenName = "Token"
 
-
 //默认空时间
 const BlankTime = "1970-01-01 00:00:00"
 const BlankDate = "1970-01-01"
@@ -69,7 +68,7 @@ const (
 
 // context key
 const (
-	TraceIdKey     = "_traceId"
+	TraceIdKey     = "PM-TRACE-ID"
 	HttpContextKey = "_httpContext"
 )
 
@@ -88,7 +87,7 @@ const (
 const (
 	MQModeRocketMQ = "RocketMQ"
 	MQModeDB       = "DB"
-	MQModeKafka	   = "Kafka"
+	MQModeKafka    = "Kafka"
 )
 
 // 发送消息状态
@@ -109,23 +108,22 @@ const (
 	MQStatusFail = 4
 )
 
-
 const (
 	OssConfigMissingSentence = "oss configuration is missing!"
 	DBOpenErrorSentence      = "db.Open(): %q\n"
 	TxOpenErrorSentence      = "tx.Open(): %q\n"
 )
 
-const(
+const (
 	TableMessageQueue             = "ppm_mqs_message_queue"
 	TableMessageQueueConsumer     = "ppm_mqs_message_queue_consumer"
 	TableMessageQueueConsumerFail = "ppm_mqs_message_queue_consumer_fail"
 )
 
-const(
-	TcId                       = "id"
-	TcIsDelete                 = "is_delete"
-	TcTopic                    = "topic"
-	TcGroupName                = "group_name"
-	TcMessageId                = "message_id"
+const (
+	TcId        = "id"
+	TcIsDelete  = "is_delete"
+	TcTopic     = "topic"
+	TcGroupName = "group_name"
+	TcMessageId = "message_id"
 )
