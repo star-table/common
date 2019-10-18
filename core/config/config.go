@@ -365,15 +365,18 @@ func loadConfig(dir string, config string, env string) error {
 	if env != "" {
 		configName += "." + env
 	}
-	conf.Viper = viper.New()
+	if conf.Viper == nil{
+		conf.Viper = viper.New()
+	}
 	conf.Viper.SetConfigName(configName)
 	conf.Viper.AddConfigPath(dir)
 	conf.Viper.SetConfigType("yaml")
-	if err := conf.Viper.ReadInConfig(); err != nil {
+	if err := conf.Viper.MergeInConfig(); err != nil {
 		fmt.Println(err)
 		return err
 	}
 	if err := conf.Viper.Unmarshal(&conf); err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
