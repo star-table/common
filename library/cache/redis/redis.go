@@ -86,6 +86,27 @@ func (rp *Proxy) Get(key string) (string, error) {
 	return string(rs.([]byte)), nil
 }
 
+func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return nil, e
+	}
+	rs, err := conn.Do("MGET", keys...)
+	if err != nil {
+		return nil, err
+	}
+	if rs == nil {
+		return nil, err
+	}
+	list := rs.([]interface{})
+	resultList := make([]string, len(list))
+	for i, v := range list{
+		resultList[i] = string(v.([]byte))
+	}
+	return resultList, nil
+}
+
 func (rp *Proxy) Del(key string) (int64, error) {
 	conn, e := Connect()
 	defer Close(conn)

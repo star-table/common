@@ -14,4 +14,5 @@ func TestSendSMS(t *testing.T) {
 	})
 	t.Log(err)
 	t.Log(resp)
+	t.Log(resp.Message)
 }

@@ -60,3 +60,14 @@ func getConn(){
 
 	conn.Close()
 }
+
+func Test_MGet(t *testing.T){
+	config.LoadUnitTestConfig()
+	rp := GetProxy()
+
+	rp.Set("3", "abc")
+	rp.Set("4", "efg")
+	v, e := rp.MGet("3", "4")
+	t.Log(e)
+	t.Log(v)
+}

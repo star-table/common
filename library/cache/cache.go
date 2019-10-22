@@ -16,6 +16,7 @@ type Cache interface {
 	Exist(key string) (bool, error)
 	Expire(key string, expire int64) (bool, error)
 	Incrby(key string, v int64) (int64, error)
+	MGet(keys ...interface{}) ([]string, error)
 
 	TryGetDistributedLock(key string, v string) (bool, error)
 	ReleaseDistributedLock(key string, v string) (bool, error)

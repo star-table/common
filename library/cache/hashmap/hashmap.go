@@ -68,6 +68,16 @@ func (c *CacheMap) Incrby(key string, v int64) (int64, error) {
 	return count, nil
 }
 
+func (c *CacheMap) MGet(keys ...interface{}) ([]string, error) {
+	resultList := make([]string, 0)
+	for _, key := range keys{
+		if v, ok := c.Cache.Load(key); ok {
+			resultList = append(resultList, v.(string))
+		}
+	}
+	return resultList, nil
+}
+
 func (c *CacheMap) TryGetDistributedLock(key string, v string) (bool, error) {
 	lock.Lock(key)
 	return true, nil
