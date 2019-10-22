@@ -72,3 +72,7 @@ func TryGetDistributedLock(key string, v string) (bool, error) {
 func ReleaseDistributedLock(key string, v string) (bool, error) {
 	return getCache().ReleaseDistributedLock(key, v)
 }
+
+func MGet(keys ...interface{}) ([]string, error){
+	return getCache().MGet(keys)
+}
