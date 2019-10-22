@@ -23,6 +23,7 @@ var conf Config = Config{
 	OSS:           nil,
 	ElasticSearch: nil,
 	Sentry:		   nil,
+	SMS:		   nil,
 }
 
 type Config struct {
@@ -40,6 +41,7 @@ type Config struct {
 	ElasticSearch *ElasticSearchConfig
 	Sentry		  *SentryConfig
 	SkyWalking 	  *SkyWalkingConfig
+	SMS			  *SMSConfig
 }
 
 type MysqlConfig struct {
@@ -181,6 +183,16 @@ type EsIndexConfig struct {
 	Issue   string
 	Project string
 	Trends  string
+}
+
+type SMSConfig struct {
+	AccessKeyId string
+	AccessKeySecret string
+	Region string
+}
+
+func GetSMSConfig() *SMSConfig{
+	return conf.SMS
 }
 
 func GetMqIssueTrendsTopicConfig() TopicConfigInfo {

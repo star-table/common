@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Shopify/sarama v1.23.1
+	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20191022020828-62f900486cb2
 	github.com/aliyun/aliyun-oss-go-sdk v2.0.1+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/bwmarrin/snowflake v0.3.0
