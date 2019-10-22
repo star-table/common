@@ -100,9 +100,11 @@ func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
 		return nil, err
 	}
 	list := rs.([]interface{})
-	resultList := make([]string, len(list))
-	for i, v := range list{
-		resultList[i] = string(v.([]byte))
+	resultList := make([]string, 0)
+	for _, v := range list{
+		if bytes, ok := v.([]byte); ok{
+			resultList = append(resultList, string(bytes))
+		}
 	}
 	return resultList, nil
 }
