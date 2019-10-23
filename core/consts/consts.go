@@ -5,6 +5,9 @@ import "time"
 //Token
 const AppHeaderTokenName = "Token"
 
+// linux操作系统
+const LinuxGOOS = "linux"
+
 //默认空时间
 const BlankTime = "1970-01-01 00:00:00"
 const BlankDate = "1970-01-01"
