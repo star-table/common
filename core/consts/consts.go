@@ -72,7 +72,14 @@ const (
 // context key
 const (
 	TraceIdKey     = "PM-TRACE-ID"
+	TraceIdLogKey  = "pmTraceId"
 	HttpContextKey = "_httpContext"
+)
+
+// 日志相关常量
+const (
+	LogAppKey = "appName"
+	LogTagKey = "tag"
 )
 
 // 默认对象id步长

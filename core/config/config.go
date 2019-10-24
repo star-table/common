@@ -22,8 +22,8 @@ var conf Config = Config{
 	Mq:            nil,
 	OSS:           nil,
 	ElasticSearch: nil,
-	Sentry:		   nil,
-	SMS:		   nil,
+	Sentry:        nil,
+	SMS:           nil,
 }
 
 type Config struct {
@@ -39,9 +39,9 @@ type Config struct {
 	Mq            *MQConfig
 	OSS           *OSSConfig
 	ElasticSearch *ElasticSearchConfig
-	Sentry		  *SentryConfig
-	SkyWalking 	  *SkyWalkingConfig
-	SMS			  *SMSConfig
+	Sentry        *SentryConfig
+	SkyWalking    *SkyWalkingConfig
+	SMS           *SMSConfig
 }
 
 type MysqlConfig struct {
@@ -71,8 +71,8 @@ type OSSConfig struct {
 }
 
 type OSSPolicyConfig struct {
-	ProjectCover  OSSPolicyInfo
-	IssueResource OSSPolicyInfo
+	ProjectCover   OSSPolicyInfo
+	IssueResource  OSSPolicyInfo
 	IssueInputFile OSSPolicyInfo
 }
 
@@ -117,6 +117,7 @@ type LogConfig struct {
 	FileSize         int64
 	FileNum          int
 	IsConsoleOut     bool
+	Tag              string
 	EnableKafka      bool
 	KafkaTopic       string
 	KafkaNameServers string
@@ -145,9 +146,9 @@ type RocketMQConfig struct {
 
 //KafKa MQ Config
 type KafkaMQConfig struct {
-	NameServers string
+	NameServers    string
 	ReconsumeTimes int
-	RePushTimes int
+	RePushTimes    int
 }
 
 type TopicConfig struct {
@@ -186,12 +187,12 @@ type EsIndexConfig struct {
 }
 
 type SMSConfig struct {
-	AccessKeyId string
+	AccessKeyId     string
 	AccessKeySecret string
-	Region string
+	Region          string
 }
 
-func GetSMSConfig() *SMSConfig{
+func GetSMSConfig() *SMSConfig {
 	return conf.SMS
 }
 
@@ -215,11 +216,11 @@ func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.IssueInputFile
 }
 
-func GetSentryConfig() *SentryConfig{
+func GetSentryConfig() *SentryConfig {
 	return conf.Sentry
 }
 
-func GetSkyWalkingConfig() *SkyWalkingConfig{
+func GetSkyWalkingConfig() *SkyWalkingConfig {
 	return conf.SkyWalking
 }
 
@@ -306,7 +307,7 @@ func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
 }
 
 func LoadUnitTestConfig() {
-	configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
+	configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
 	configName := "application.common"
 	env := "local"
 	for _, arg := range flag.Args() {
@@ -362,7 +363,7 @@ func LoadExtraEnvConfig(dir string, config string, env string, extraConfig inter
 
 func loadExtraConfig(dir string, config string, env string, extraConfig interface{}) error {
 	err := loadConfig(dir, config, env)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	if err := conf.Viper.Unmarshal(&extraConfig); err != nil {
@@ -371,13 +372,12 @@ func loadExtraConfig(dir string, config string, env string, extraConfig interfac
 	return nil
 }
 
-
 func loadConfig(dir string, config string, env string) error {
 	configName := config
 	if env != "" {
 		configName += "." + env
 	}
-	if conf.Viper == nil{
+	if conf.Viper == nil {
 		conf.Viper = viper.New()
 	}
 	conf.Viper.SetConfigName(configName)

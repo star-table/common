@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/model"
 	"gitea.bjx.cloud/allstar/common/core/threadlocal"
 	"github.com/Shopify/sarama"
@@ -11,7 +11,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"strconv"
-	"strings"
 	"sync"
 )
 
@@ -36,7 +35,7 @@ type LogKafka struct {
 }
 
 type SysLogger struct {
-	log          *zap.SugaredLogger
+	log          *zap.Logger
 	name         string
 	path         string
 	level        zapcore.Level
@@ -56,115 +55,50 @@ func (lk *LogKafka) Write(p []byte) (n int, err error) {
 
 }
 
-//func getTraceId() string {
-//	if traceId, ok := threadlocal.Mgr.GetValue(consts.TraceIdKey); ok {
-//		if traceId != nil {
-//			fmt.Println(traceId)
-//			return traceId.(string)
-//		}
-//	}
-//	return ""
-//}
-
-func insertTraceId(args ...interface{}) []interface{} {
-	cl := []interface{}{fmt.Sprintf("traceId=%s;", threadlocal.GetTraceId())}
-	return append(cl, args...)
-}
-func insertTraceIdf(template string, args ...interface{}) (string, []interface{}) {
-	t := fmt.Sprintf("%s;%s", "%s", template)
-	return t, insertTraceId(args...)
-}
-func insertTraceIdH(httpContext *model.HttpContext, args ...interface{}) []interface{} {
-	cl := []interface{}{fmt.Sprintf("traceId=%s;", httpContext.TraceId)}
-	return append(cl, args...)
-}
-func insertTraceIdHf(httpContext *model.HttpContext, template string, args ...interface{}) (string, []interface{}) {
-	t := fmt.Sprintf("%s;%s", "%s", template)
-	return t, insertTraceIdH(httpContext, args...)
+func getTraceIdFieldByThreadLocal() (string, zap.Field) {
+	traceId := threadlocal.GetTraceId()
+	return traceId, zap.String(consts.TraceIdLogKey, traceId)
 }
 
-func (s *SysLogger) Info(args ...interface{}) {
+func getTraceIdFieldByHttpContext(httpContext *model.HttpContext) (string, zap.Field) {
+	traceId := httpContext.TraceId
+	return traceId, zap.String(consts.TraceIdLogKey, traceId)
+}
+
+func (s *SysLogger) Info(msg string, fields ...zap.Field) {
 	s.Init()
-	s.log.Info(insertTraceId(args...))
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Info("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
-func (s *SysLogger) InfoH(httpContext *model.HttpContext, args ...interface{}) {
+func (s *SysLogger) InfoH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
 	s.Init()
-	s.log.Info(insertTraceIdH(httpContext, args...))
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Info("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
-func (s *SysLogger) Infof(template string, args ...interface{}) {
+func (s *SysLogger) Error(msg string, fields ...zap.Field) {
 	s.Init()
-	t, ags := insertTraceIdf(template, args...)
-	s.log.Infof(t, ags...)
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Error("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
-func (s *SysLogger) InfoHf(httpContext *model.HttpContext, template string, args ...interface{}) {
+func (s *SysLogger) ErrorH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
 	s.Init()
-	t, ags := insertTraceIdHf(httpContext, template, args...)
-	s.log.Infof(t, ags...)
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Error("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
-func (s *SysLogger) Error(args ...interface{}) {
+func (s *SysLogger) Debug(msg string, fields ...zap.Field) {
 	s.Init()
-	s.log.Error(insertTraceId(args...))
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Debug("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
-func (s *SysLogger) ErrorH(httpContext *model.HttpContext, args ...interface{}) {
+func (s *SysLogger) DebugH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
 	s.Init()
-	s.log.Error(insertTraceIdH(httpContext, args...))
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Debug("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
-
-func (s *SysLogger) Errorf(template string, args ...interface{}) {
-	s.Init()
-	t, ags := insertTraceIdf(template, args...)
-	s.log.Errorf(t, ags...)
-}
-
-func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, template string, args ...interface{}) {
-	s.Init()
-	t, ags := insertTraceIdHf(httpContext, template, args...)
-	s.log.Errorf(t, ags...)
-}
-
-func (s *SysLogger) Debug(args ...interface{}) {
-	s.Init()
-	s.log.Debug(insertTraceId(args...))
-}
-
-func (s *SysLogger) DebugH(httpContext *model.HttpContext, args ...interface{}) {
-	s.Init()
-	s.log.Debug(insertTraceIdH(httpContext, args...))
-}
-
-func (s *SysLogger) Debugf(template string, args ...interface{}) {
-	s.Init()
-	t, ags := insertTraceIdf(template, args...)
-	s.log.Debugf(t, ags...)
-}
-
-func (s *SysLogger) DebugHf(httpContext *model.HttpContext, template string, args ...interface{}) {
-	s.Init()
-	t, ags := insertTraceIdHf(httpContext, template, args...)
-	s.log.Debugf(t, ags...)
-}
-
-//func (s *SysLogger) Fatal(args ...interface{}) {
-//	s.log.Fatal(insertTraceId(args))
-//}
-//
-//func (s *SysLogger) FatalH(httpContext *domains.HttpContext, args ...interface{}) {
-//	s.log.Fatal(insertTraceIdH(httpContext, args))
-//}
-//
-//func (s *SysLogger) Fatalf(template string, args ...interface{}) {
-//	t, ags := insertTraceIdf(template, args)
-//	s.log.Fatalf(t, ags)
-//}
-//
-//func (s *SysLogger) FatalHf(httpContext *domains.HttpContext, template string, args ...interface{}) {
-//	t, ags := insertTraceIdHf(httpContext, template, args)
-//	s.log.Fatalf(t, ags)
-//}
 
 func getLoggerLevel(lvl string) zapcore.Level {
 	if level, ok := levelMap[lvl]; ok {
@@ -219,68 +153,26 @@ func (s *SysLogger) InitLogger() *SysLogger {
 	})
 	encoder := zap.NewProductionEncoderConfig()
 	encoder.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoder.EncodeCaller = zapcore.FullCallerEncoder
 
-	// High-priority output should also go to standard error, and low-priority
-	// output should also go to standard out.
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	//consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-
-	var allCore []zapcore.Core
+	var core zapcore.Core
 
 	if logConfig.IsConsoleOut == true {
-		allCore = append(allCore, zapcore.NewCore(zapcore.NewJSONEncoder(encoder), consoleDebugging, zap.NewAtomicLevelAt(level)))
+		// High-priority output should also go to standard error, and low-priority
+		// output should also go to standard out.
+		consoleOut := zapcore.Lock(os.Stdout)
+
+		core = zapcore.NewCore(zapcore.NewJSONEncoder(encoder),
+			zapcore.NewMultiWriteSyncer(consoleOut, syncWriter),
+			zap.NewAtomicLevelAt(level))
 	}
 
-	if logConfig.EnableKafka == true {
-		s.kafkaTopic = strings.Replace(logConfig.KafkaTopic, ":appName:", config.GetApplication().Name, -1)
+	// 设置初始化字段
+	filed := zap.Fields(zap.String(consts.LogTagKey, logConfig.Tag), zap.String(consts.LogAppKey, config.GetApplication().Name))
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), filed)
 
-		//设置日志输入到Kafka的配置
-		kafkaConfig := sarama.NewConfig()
-		//等待leader服务器保存成功后的响应
-		kafkaConfig.Producer.RequiredAcks = sarama.WaitForLocal
-		// 随机的分区类型
-		kafkaConfig.Producer.Partitioner = sarama.NewRandomPartitioner
-		//是否等待成功和失败后的响应,只有上面的RequireAcks设置不是NoReponse这里才有用.
-		kafkaConfig.Producer.Return.Successes = true
-		kafkaConfig.Producer.Return.Errors = true
-
-		var err error = nil
-
-		kl := LogKafka{
-			Topic: s.kafkaTopic,
-		}
-		kl.Producer, err = sarama.NewSyncProducer(strings.Split(logConfig.KafkaNameServers, ","), kafkaConfig)
-		if err != nil {
-			fmt.Println(" log config kafka init error. ")
-		}
-		topicErrors := zapcore.AddSync(&kl)
-		// 打印在kafka
-		kafkaEncoder := zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig())
-		kafkaCore := zapcore.NewCore(kafkaEncoder, topicErrors, zap.NewAtomicLevelAt(level))
-		allCore = append(allCore, kafkaCore)
-	} else {
-		s.kafkaTopic = ""
-	}
-
-	allCore = append(allCore, zapcore.NewCore(zapcore.NewJSONEncoder(encoder), syncWriter, zap.NewAtomicLevelAt(level)))
-
-	core := zapcore.NewTee(allCore...)
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-
-	//level := getLoggerLevel(logConfig.Level)
-	//syncWriter := zapcore.AddSync(&lumberjack.Logger{
-	//	Filename:   logConfig.LogPath, // ⽇志⽂件路径
-	//	MaxSize:    1024,     // megabytes
-	//	MaxBackups: 20,       //最多保留20个备份
-	//	LocalTime:  true,
-	//	Compress:   true, // 是否压缩 disabled by default
-	//})
-	//encoder := zap.NewProductionEncoderConfig()
-	//encoder.EncodeTime = zapcore.ISO8601TimeEncoder
-	//core := zapcore.NewCore(zapcore.NewJSONEncoder(encoder), syncWriter, zap.NewAtomicLevelAt(level))
-	//logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(0))
-	//
-	s.log = logger.Sugar()
+	//s.log = logger.Sugar()
+	s.log = logger
 	s.path = logConfig.LogPath
 	s.level = level
 	s.isConsoleOut = logConfig.IsConsoleOut
