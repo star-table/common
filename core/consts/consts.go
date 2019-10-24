@@ -71,8 +71,9 @@ const (
 
 // context key
 const (
-	TraceIdKey     = "PM-TRACE-ID"
-	TraceIdLogKey  = "pmTraceId"
+	TraceIdKey    = "PM-TRACE-ID"
+	TraceIdLogKey = "pmTraceId"
+
 	HttpContextKey = "_httpContext"
 )
 
