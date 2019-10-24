@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-const(
+const (
 	KafkaTestErrorMessage = "error"
 )
 
@@ -18,15 +18,14 @@ func TestProxy_SendMessage(t *testing.T) {
 
 	reconsumer := 5
 	_, err := proxy.PushMessage(&model.MqMessage{
-		Topic:     "unittest",
-		Partition: 0,
-		Body:      "123",
+		Topic:          "unittest",
+		Partition:      0,
+		Body:           "123",
 		ReconsumeTimes: &reconsumer,
-		RePushTimes: &reconsumer,
+		RePushTimes:    &reconsumer,
 	})
 	t.Log(err)
 }
-
 
 func TestProxy_ConsumePushMessage(t *testing.T) {
 	config.LoadUnitTestConfig()
@@ -34,13 +33,12 @@ func TestProxy_ConsumePushMessage(t *testing.T) {
 	proxy := Proxy{}
 	go proxy.ConsumeMessage("unittest", "123", func(msg *model.MqMessageExt) errors.SystemErrorInfo {
 		log.Infof("msg offset: %d, partition: %d,  value: %s", msg.Offset, msg.Partition, string(msg.Body))
-		if msg.Body == KafkaTestErrorMessage{
+		if msg.Body == KafkaTestErrorMessage {
 			return errors.BuildSystemErrorInfo(errors.KafkaMqConsumeMsgError)
 		}
 		return nil
-	}, func(message *model.MqMessageExt){
+	}, func(message *model.MqMessageExt) {
 
-		log.Info("最终失败:", json.ToJsonIgnoreError(message))
+		log.Info("最终失败:" + json.ToJsonIgnoreError(message))
 	})
 }
-

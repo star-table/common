@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"gitea.bjx.cloud/allstar/common/core/logger"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"sync"
 
 	"gitea.bjx.cloud/allstar/common/core/config"
@@ -52,17 +53,17 @@ type Domain interface {
 
 func Close(conn sqlbuilder.Database, tx sqlbuilder.Tx) {
 	if err := conn.Close(); err != nil {
-		logger.GetDefaultLogger().Error(err)
+		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
 	}
 	if err := tx.Close(); err != nil {
-		logger.GetDefaultLogger().Error(err)
+		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
 	}
 }
 
 func Rollback(tx sqlbuilder.Tx) {
 	err := tx.Rollback()
 	if err != nil {
-		logger.GetDefaultLogger().Error("Rollback error", err)
+		logger.GetDefaultLogger().Error("Rollback error " + strs.ObjectToString(err))
 	}
 }
 

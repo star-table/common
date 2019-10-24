@@ -6,6 +6,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/logger"
 	"gitea.bjx.cloud/allstar/common/core/model"
 	"gitea.bjx.cloud/allstar/common/core/util/id/snowflake"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"gitea.bjx.cloud/allstar/common/core/util/times"
 	"gitea.bjx.cloud/allstar/common/library/db/mysql"
 	"strconv"
@@ -49,7 +50,7 @@ func (dbMqProxy *DbMQProxy) PushMessage(messages ...*model.MqMessage) (*[]model.
 
 	err2 := mysql.BatchInsert(&PpmMqsMessageQueue{}, messagePosInterface)
 	if err2 != nil {
-		log.Error(err2)
+		log.Error(strs.ObjectToString(err2))
 		return nil, errors.BuildSystemErrorInfo(errors.DbMQSendMsgError)
 	}
 
@@ -92,7 +93,7 @@ func (dbMqProxy *DbMQProxy) ConsumeMessage(topic string, groupId string, fu func
 
 		mqcfm, err := queryTopicGroupMessageFail(consumer, mqs)
 		if err != nil {
-			log.Error(err)
+			log.Error(strs.ObjectToString(err))
 			times.Sleep(sleepTime)
 			continue
 		}
@@ -113,7 +114,7 @@ func (dbMqProxy *DbMQProxy) ConsumeMessage(topic string, groupId string, fu func
 func checkComsumerTopicMessage(mqs *[]PpmMqsMessageQueue, err errors.SystemErrorInfo) (isContinue bool) {
 
 	if err != nil {
-		log.Error(err)
+		log.Error(strs.ObjectToString(err))
 		times.Sleep(sleepTime)
 		return true
 	}
@@ -160,7 +161,7 @@ func consumerSuccessMessageHandler(consumer *PpmMqsMessageQueueConsumer, success
 	consumer.UpdateTime = time.Now()
 	err := mysql.Update(consumer)
 	if err != nil {
-		log.Error(err)
+		log.Error(strs.ObjectToString(err))
 		return errors.BuildSystemErrorInfo(errors.MysqlOperateError, err)
 	}
 	return nil
@@ -184,7 +185,7 @@ func consumerFailMessageHandler(consumer *PpmMqsMessageQueueConsumer, failId int
 
 		err := mysql.Update(&mqcf)
 		if err != nil {
-			log.Error(err)
+			log.Error(strs.ObjectToString(err))
 			return b, errors.BuildSystemErrorInfo(errors.MysqlOperateError, err)
 		}
 	} else {
@@ -206,7 +207,7 @@ func consumerFailMessageHandler(consumer *PpmMqsMessageQueueConsumer, failId int
 		}
 		err2 := mysql.Insert(cf)
 		if err2 != nil {
-			log.Error("consumer fail save db fail. %v %v.", *cf, err2)
+			log.Errorf("consumer fail save db fail. %v %v.", *cf, err2)
 			return b, errors.BuildSystemErrorInfo(errors.MysqlOperateError, err2)
 		}
 	}
@@ -273,7 +274,7 @@ func queryTopicMessage(consumer *PpmMqsMessageQueueConsumer, count int) (*[]PpmM
 
 	err := mysql.SelectAllByCondWithNumAndOrder(consts.TableMessageQueue, cond, nil, 1, count, "id asc", mqs)
 	if err != nil {
-		log.Error(err)
+		log.Error(strs.ObjectToString(err))
 		return nil, errors.BuildSystemErrorInfo(errors.MysqlOperateError, err)
 	}
 	return mqs, nil
@@ -297,7 +298,7 @@ func queryTopicGroupMessageFail(consumer *PpmMqsMessageQueueConsumer, mqs *[]Ppm
 
 	err := mysql.SelectAllByCond(consts.TableMessageQueueConsumerFail, cond, mqcfs)
 	if err != nil {
-		log.Error(err)
+		log.Error(strs.ObjectToString(err))
 		return nil, errors.BuildSystemErrorInfo(errors.MysqlOperateError, err)
 	}
 

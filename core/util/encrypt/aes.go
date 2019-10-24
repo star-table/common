@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"gitea.bjx.cloud/allstar/common/core/logger"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 )
 
 var key = "&polaris*aes#key"
@@ -16,7 +17,7 @@ func AesEncrypt(orig string) (string, error) {
 	// 分组秘钥
 	block, err := aes.NewCipher(k)
 	if err != nil {
-		logger.GetDefaultLogger().Error(err)
+		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
 		return "", err
 	}
 	// 获取秘钥块的长度
@@ -37,7 +38,7 @@ func AesDecrypt(cryted string) (string, error) {
 	// 转成字节数组
 	crytedByte, err := Base58Decode(cryted)
 	if err != nil {
-		logger.GetDefaultLogger().Error(err)
+		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
 		return "", err
 	}
 	k := []byte(key)
@@ -45,7 +46,7 @@ func AesDecrypt(cryted string) (string, error) {
 	// 分组秘钥
 	block, err := aes.NewCipher(k)
 	if err != nil {
-		logger.GetDefaultLogger().Error(err)
+		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
 		return "", err
 	}
 	// 获取秘钥块的长度

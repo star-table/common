@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
 	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/model"
@@ -76,6 +77,18 @@ func (s *SysLogger) InfoH(httpContext *model.HttpContext, msg string, fields ...
 	s.log.Info("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
+func (s *SysLogger) Infof(fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.Info(msg)
+}
+
+func (s *SysLogger) InfoHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.InfoH(httpContext, msg)
+}
+
 func (s *SysLogger) Error(msg string, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
@@ -88,6 +101,18 @@ func (s *SysLogger) ErrorH(httpContext *model.HttpContext, msg string, fields ..
 	s.log.Error("[traceId="+traceId+"]"+msg, append(fields, fie)...)
 }
 
+func (s *SysLogger) Errorf(fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.Error(msg)
+}
+
+func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.ErrorH(httpContext, msg)
+}
+
 func (s *SysLogger) Debug(msg string, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
@@ -98,6 +123,18 @@ func (s *SysLogger) DebugH(httpContext *model.HttpContext, msg string, fields ..
 	s.Init()
 	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
 	s.log.Debug("[traceId="+traceId+"]"+msg, append(fields, fie)...)
+}
+
+func (s *SysLogger) Debugf(fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.Debug(msg)
+}
+
+func (s *SysLogger) DebugHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
+	s.Init()
+	msg := fmt.Sprintf(fmtstr, args...)
+	s.DebugH(httpContext, msg)
 }
 
 func getLoggerLevel(lvl string) zapcore.Level {

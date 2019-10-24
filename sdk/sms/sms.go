@@ -2,15 +2,18 @@ package sms
 
 import (
 	"errors"
-	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"gitea.bjx.cloud/allstar/common/core/logger"
 	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 )
 
-func SendSMS(phone string, signName string, templateCode string, params map[string]string) (*dysmsapi.SendSmsResponse, error){
+var log = logger.GetDefaultLogger()
+
+func SendSMS(phone string, signName string, templateCode string, params map[string]string) (*dysmsapi.SendSmsResponse, error) {
 	smsConfig := config.GetSMSConfig()
-	if smsConfig == nil{
+	if smsConfig == nil {
 		return nil, errors.New("missing SMS configuration")
 	}
 
@@ -26,10 +29,8 @@ func SendSMS(phone string, signName string, templateCode string, params map[stri
 
 	response, err := client.SendSms(request)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Error("send sms error:" + strs.ObjectToString(err))
 		return nil, err
 	}
 	return response, nil
 }
-
-

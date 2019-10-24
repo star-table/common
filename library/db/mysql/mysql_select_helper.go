@@ -3,6 +3,7 @@ package mysql
 import (
 	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/logger"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"upper.io/db.v3"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
@@ -13,14 +14,14 @@ func SelectById(table string, id interface{}, obj interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
 		return err
 	}
 	err = conn.Collection(table).Find(db.Cond{
-		consts.TcId:        id,
+		consts.TcId:       id,
 		consts.TcIsDelete: consts.AppIsNoDelete,
 	}).One(obj)
 	if err != nil {
@@ -31,7 +32,7 @@ func SelectById(table string, id interface{}, obj interface{}) error {
 
 func TransSelectById(tx sqlbuilder.Tx, table string, id interface{}, obj interface{}) error {
 	err := tx.Collection(table).Find(db.Cond{
-		consts.TcId:        id,
+		consts.TcId:       id,
 		consts.TcIsDelete: consts.AppIsNoDelete,
 	}).One(obj)
 	if err != nil {
@@ -44,7 +45,7 @@ func SelectCountByCond(table string, cond db.Cond) (uint64, error) {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -69,7 +70,7 @@ func SelectOneByCond(table string, cond db.Cond, obj interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -94,7 +95,7 @@ func SelectByQuery(query string, objs interface{}, args ...interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -125,7 +126,7 @@ func SelectAllByCond(table string, cond db.Cond, objs interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -146,12 +147,11 @@ func TransSelectAllByCond(tx sqlbuilder.Tx, table string, cond db.Cond, objs int
 	return nil
 }
 
-
 func SelectAllByCondWithPageAndOrder(table string, cond db.Cond, union *db.Union, page int, size int, order interface{}, objs interface{}) (uint64, error) {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -205,7 +205,7 @@ func SelectAllByCondWithNumAndOrder(table string, cond db.Cond, union *db.Union,
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			log.Info(err)
+			log.Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -251,7 +251,7 @@ func IsExistByCond(table string, cond db.Cond) (bool, error) {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {

@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"gitea.bjx.cloud/allstar/common/core/logger"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 
@@ -9,7 +10,7 @@ func Insert(obj Domain) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -26,7 +27,7 @@ func InsertReturnId(obj Domain) (interface{}, error) {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
@@ -78,11 +79,11 @@ func BatchInsert(obj Domain, objs []interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
 		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(err)
+			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
 		}
 	}()
 	if err != nil {
-		log.Error(err)
+		log.Error(strs.ObjectToString(err))
 		return err
 	}
 

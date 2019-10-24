@@ -121,8 +121,8 @@ const (
 
 const (
 	OssConfigMissingSentence = "oss configuration is missing!"
-	DBOpenErrorSentence      = "db.Open(): %q\n"
-	TxOpenErrorSentence      = "tx.Open(): %q\n"
+	DBOpenErrorSentence      = "db.Open(): "
+	TxOpenErrorSentence      = "tx.Open(): "
 )
 
 const (
