@@ -219,7 +219,7 @@ func (s *SysLogger) InitLogger() *SysLogger {
 
 	// 设置初始化字段
 	filed := zap.Fields(zap.String(consts.LogTagKey, logConfig.Tag), zap.String(consts.LogAppKey, config.GetApplication().Name))
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2), filed)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), filed)
 
 	//s.log = logger.Sugar()
 	s.log = logger
