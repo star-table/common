@@ -6,6 +6,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/model"
 	"gitea.bjx.cloud/allstar/common/core/threadlocal"
+	"gitea.bjx.cloud/allstar/common/core/util/strs"
 	"github.com/Shopify/sarama"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -66,10 +67,10 @@ func getTraceIdFieldByHttpContext(httpContext *model.HttpContext) (string, zap.F
 	return traceId, zap.String(consts.TraceIdLogKey, traceId)
 }
 
-func (s *SysLogger) Info(msg string, fields ...zap.Field) {
+func (s *SysLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Info("[traceId="+traceId+"]"+msg, append(fields, fie)...)
+	s.log.Info("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
 }
 func (s *SysLogger) InfoH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
 	s.Init()
@@ -89,10 +90,10 @@ func (s *SysLogger) InfoHf(httpContext *model.HttpContext, fmtstr string, args .
 	s.InfoH(httpContext, msg)
 }
 
-func (s *SysLogger) Error(msg string, fields ...zap.Field) {
+func (s *SysLogger) Error(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Error("[traceId="+traceId+"]"+msg, append(fields, fie)...)
+	s.log.Error("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
 }
 
 func (s *SysLogger) ErrorH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
@@ -113,10 +114,10 @@ func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, fmtstr string, args 
 	s.ErrorH(httpContext, msg)
 }
 
-func (s *SysLogger) Debug(msg string, fields ...zap.Field) {
+func (s *SysLogger) Debug(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Debug("[traceId="+traceId+"]"+msg, append(fields, fie)...)
+	s.log.Debug("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
 }
 
 func (s *SysLogger) DebugH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
