@@ -70,7 +70,11 @@ func getTraceIdFieldByHttpContext(httpContext *model.HttpContext) (string, zap.F
 func (s *SysLogger) Info(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Info("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
+	str, ok := msg.(string)
+	if !ok {
+		str = strs.ObjectToString(msg)
+	}
+	s.log.Info("[traceId="+traceId+"]"+str, append(fields, fie)...)
 }
 func (s *SysLogger) InfoH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
 	s.Init()
@@ -93,7 +97,11 @@ func (s *SysLogger) InfoHf(httpContext *model.HttpContext, fmtstr string, args .
 func (s *SysLogger) Error(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Error("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
+	str, ok := msg.(string)
+	if !ok {
+		str = strs.ObjectToString(msg)
+	}
+	s.log.Error("[traceId="+traceId+"]"+str, append(fields, fie)...)
 }
 
 func (s *SysLogger) ErrorH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
@@ -117,7 +125,11 @@ func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, fmtstr string, args 
 func (s *SysLogger) Debug(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
-	s.log.Debug("[traceId="+traceId+"]"+strs.ObjectToString(msg), append(fields, fie)...)
+	str, ok := msg.(string)
+	if !ok {
+		str = strs.ObjectToString(msg)
+	}
+	s.log.Debug("[traceId="+traceId+"]"+str, append(fields, fie)...)
 }
 
 func (s *SysLogger) DebugH(httpContext *model.HttpContext, msg string, fields ...zap.Field) {
@@ -207,7 +219,7 @@ func (s *SysLogger) InitLogger() *SysLogger {
 
 	// 设置初始化字段
 	filed := zap.Fields(zap.String(consts.LogTagKey, logConfig.Tag), zap.String(consts.LogAppKey, config.GetApplication().Name))
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), filed)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2), filed)
 
 	//s.log = logger.Sugar()
 	s.log = logger
