@@ -3,7 +3,7 @@ package consts
 import "time"
 
 //Token
-const AppHeaderTokenName = "Token"
+const AppHeaderTokenName = "PM-TOKEN"
 
 // linux操作系统
 const LinuxGOOS = "linux"
