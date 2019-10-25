@@ -85,13 +85,16 @@ func (s *SysLogger) InfoH(httpContext *model.HttpContext, msg string, fields ...
 func (s *SysLogger) Infof(fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.Info(msg)
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Info("[traceId="+traceId+"]"+msg, fie)
 }
 
 func (s *SysLogger) InfoHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.InfoH(httpContext, msg)
+
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Info("[traceId="+traceId+"]"+msg, fie)
 }
 
 func (s *SysLogger) Error(msg interface{}, fields ...zap.Field) {
@@ -113,13 +116,16 @@ func (s *SysLogger) ErrorH(httpContext *model.HttpContext, msg string, fields ..
 func (s *SysLogger) Errorf(fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.Error(msg)
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Error("[traceId="+traceId+"]"+msg, fie)
 }
 
 func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.ErrorH(httpContext, msg)
+
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Error("[traceId="+traceId+"]"+msg, fie)
 }
 
 func (s *SysLogger) Debug(msg interface{}, fields ...zap.Field) {
@@ -141,13 +147,15 @@ func (s *SysLogger) DebugH(httpContext *model.HttpContext, msg string, fields ..
 func (s *SysLogger) Debugf(fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.Debug(msg)
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	s.log.Debug("[traceId="+traceId+"]"+msg, fie)
 }
 
 func (s *SysLogger) DebugHf(httpContext *model.HttpContext, fmtstr string, args ...interface{}) {
 	s.Init()
 	msg := fmt.Sprintf(fmtstr, args...)
-	s.DebugH(httpContext, msg)
+	traceId, fie := getTraceIdFieldByHttpContext(httpContext)
+	s.log.Debug("[traceId="+traceId+"]"+msg, fie)
 }
 
 func getLoggerLevel(lvl string) zapcore.Level {
