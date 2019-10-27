@@ -31,5 +31,5 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	upper.io/db.v3 v3.5.7+incompatible
+	upper.io/db.v3 v3.6.3+incompatible
 )

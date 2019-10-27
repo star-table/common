@@ -318,3 +318,4 @@ honnef.co/go/tools v0.0.0-20180728063816-88497007e858/go.mod h1:rf3lG4BRIbNafJWh
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 upper.io/db.v3 v3.5.7+incompatible h1:3MJSnJQ+NMxBxuNwO+gOKFiugwv+f61LbyuZYSPzoi4=
 upper.io/db.v3 v3.5.7+incompatible/go.mod h1:FgTdD24eBjJAbPKsQSiHUNgXjOR4Lub3u1UMHSIh82Y=
+upper.io/db.v3 v3.6.3+incompatible/go.mod h1:FgTdD24eBjJAbPKsQSiHUNgXjOR4Lub3u1UMHSIh82Y=
