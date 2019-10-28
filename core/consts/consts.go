@@ -81,6 +81,7 @@ const (
 const (
 	LogAppKey = "appName"
 	LogTagKey = "tag"
+	LogMqMessageKey = "mqMessage"
 )
 
 // 默认对象id步长

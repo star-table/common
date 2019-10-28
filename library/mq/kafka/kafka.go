@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/errors"
 	"gitea.bjx.cloud/allstar/common/core/logger"
 	"gitea.bjx.cloud/allstar/common/core/model"
@@ -10,6 +11,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/util/uuid"
 	"gitea.bjx.cloud/allstar/common/library/cache"
 	"github.com/Shopify/sarama"
+	"go.uber.org/zap"
 	"strconv"
 	"strings"
 	"time"
@@ -176,10 +178,10 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 		}
 		if pushErr != nil {
 			//最终推送失败，记log
-			log.Errorf("消息推送失败，无重试次数，消息内容：%s", json.ToJsonIgnoreError(message))
+			log.Error("消息推送失败，无重试次数", zap.String(consts.LogMqMessageKey, json.ToJsonIgnoreError(message)))
 			return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, pushErr)
 		}
-
+		log.Info("消息发送成功 %s", zap.String(consts.LogMqMessageKey, json.ToJsonIgnoreError(message)))
 		msgExts[i] = model.MqMessageExt{
 			MqMessage: model.MqMessage{
 				Topic:     msg.Topic,
@@ -189,7 +191,6 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 				Offset:    msg.Offset,
 			},
 		}
-		log.Infof("消息发送成功 %s", json.ToJsonIgnoreError(msgExts))
 	}
 	return &msgExts, nil
 }
