@@ -68,6 +68,7 @@ type OSSConfig struct {
 	AccessKeyId     string
 	AccessKeySecret string
 	Policies        OSSPolicyConfig
+	RootPath        string
 }
 
 type OSSPolicyConfig struct {
