@@ -69,6 +69,7 @@ type OSSConfig struct {
 	AccessKeySecret string
 	Policies        OSSPolicyConfig
 	RootPath        string
+	LocalDomain     string
 }
 
 type OSSPolicyConfig struct {
