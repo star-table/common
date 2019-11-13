@@ -16,6 +16,7 @@ var conf Config = Config{
 	Mail:          nil,
 	Server:        nil,
 	DingTalk:      nil,
+	FeiShu: 	   nil,
 	Logs:          nil,
 	Application:   nil,
 	Parameters:    nil,
@@ -33,6 +34,7 @@ type Config struct {
 	Mail          *MailConfig
 	Server        *ServerConfig
 	DingTalk      *DingTalkSDKConfig
+	FeiShu		  *FeiShuSdkConfig
 	Logs          *map[string]LogConfig
 	Application   *ApplicationConfig
 	Parameters    *ParameterConfig
@@ -111,6 +113,13 @@ type DingTalkSDKConfig struct {
 	Token       string
 	AesKey      string
 	AppId       int64
+}
+
+type FeiShuSdkConfig struct {
+	AppId string
+	AppSecret string
+	EventEncryptKey string
+	EventVerifyToken string
 }
 
 type LogConfig struct {
