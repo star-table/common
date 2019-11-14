@@ -30,28 +30,29 @@ var conf Config = Config{
 
 type Config struct {
 	Viper         *viper.Viper
-	Mysql         *MysqlConfig
-	Redis         *RedisConfig
-	Mail          *MailConfig
-	Server        *ServerConfig
-	DingTalk      *DingTalkSDKConfig
-	FeiShu        *FeiShuSdkConfig
-	ScheduleTime  *ScheduleTimeConfig
+	Mysql         *MysqlConfig        //数据库配置
+	Redis         *RedisConfig        //redis配置
+	Mail          *MailConfig         //邮件配置
+	Server        *ServerConfig       //服务配置
+	DingTalk      *DingTalkSDKConfig  //钉钉配置
+	FeiShu        *FeiShuSdkConfig    //飞书配置
+	ScheduleTime  *ScheduleTimeConfig //定时时间配置
 	Logs          *map[string]LogConfig
-	Application   *ApplicationConfig
-	Parameters    *ParameterConfig
-	Mq            *MQConfig
-	OSS           *OSSConfig
-	ElasticSearch *ElasticSearchConfig
-	Sentry        *SentryConfig
-	SkyWalking    *SkyWalkingConfig
-	SMS           *SMSConfig
+	Application   *ApplicationConfig   //应用配置
+	Parameters    *ParameterConfig     //参数配置
+	Mq            *MQConfig            //mq配置
+	OSS           *OSSConfig           //oss配置
+	ElasticSearch *ElasticSearchConfig //es配置
+	Sentry        *SentryConfig        //sentry配置
+	SkyWalking    *SkyWalkingConfig    //skywalking配置
+	SMS           *SMSConfig           //消息配置
 }
 
 type ScheduleTimeConfig struct {
 	Interval string
 }
 
+//mq配置
 type MysqlConfig struct {
 	Host     string
 	Port     int
@@ -60,6 +61,7 @@ type MysqlConfig struct {
 	Database string
 }
 
+//redis配置
 type RedisConfig struct {
 	Host           string
 	Port           int
@@ -70,6 +72,7 @@ type RedisConfig struct {
 	MaxIdleTimeout int
 }
 
+//oss配置
 type OSSConfig struct {
 	BucketName      string
 	EndPoint        string
@@ -92,6 +95,7 @@ type OSSPolicyInfo struct {
 	MaxFileSize int64
 }
 
+//邮件配置
 type MailConfig struct {
 	Usr  string
 	Pwd  string
