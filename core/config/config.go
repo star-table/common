@@ -213,6 +213,10 @@ func GetSMSConfig() *SMSConfig {
 	return conf.SMS
 }
 
+func GetScheduleTime() *ScheduleTimeConfig {
+	return conf.ScheduleTime
+}
+
 func GetMqIssueTrendsTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.IssueTrends
 }
