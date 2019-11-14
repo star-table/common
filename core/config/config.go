@@ -49,7 +49,8 @@ type Config struct {
 }
 
 type ScheduleTimeConfig struct {
-	SecondInterval int //期间区间秒字段的值,提供给time.ParseDuration函数使用
+	SecondInterval                  int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
+	ScheduleDailyProjectTriggerCron string //配置项目日报每日触发时间
 }
 
 //mq配置
@@ -173,11 +174,23 @@ type KafkaMQConfig struct {
 }
 
 type TopicConfig struct {
-	IssueTrends   TopicConfigInfo
-	ProjectTrends TopicConfigInfo
+	IssueTrends               TopicConfigInfo
+	ProjectTrends             TopicConfigInfo
+	DailyProjectReportProject DailyProjectReportProjectInfo
+	DailyProjectReportMsg     DailyProjectReportMsgInfo
 }
 
 type TopicConfigInfo struct {
+	Topic   string
+	GroupId string
+}
+
+type DailyProjectReportProjectInfo struct {
+	Topic   string
+	GroupId string
+}
+
+type DailyProjectReportMsgInfo struct {
 	Topic   string
 	GroupId string
 }
@@ -219,6 +232,14 @@ func GetSMSConfig() *SMSConfig {
 
 func GetScheduleTime() *ScheduleTimeConfig {
 	return conf.ScheduleTime
+}
+
+func GetMqDailyProjectReportProjectTopicConfig() DailyProjectReportProjectInfo {
+	return conf.Mq.Topics.DailyProjectReportProject
+}
+
+func GetMqDailyProjectReportMsgTopicConfig() DailyProjectReportMsgInfo {
+	return conf.Mq.Topics.DailyProjectReportMsg
 }
 
 func GetMqIssueTrendsTopicConfig() TopicConfigInfo {
