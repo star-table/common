@@ -49,8 +49,8 @@ type Config struct {
 }
 
 type ScheduleTimeConfig struct {
-	SecondInterval                  int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
-	ScheduleDailyProjectTriggerCron string //配置项目日报每日触发时间
+	ScheduleDailyProjectReportSecondInterval int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
+	ScheduleDailyProjectReportTriggerCron    string //配置项目日报每日触发时间
 }
 
 //mq配置
