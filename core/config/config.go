@@ -16,7 +16,8 @@ var conf Config = Config{
 	Mail:          nil,
 	Server:        nil,
 	DingTalk:      nil,
-	FeiShu: 	   nil,
+	FeiShu:        nil,
+	ScheduleTime:  nil,
 	Logs:          nil,
 	Application:   nil,
 	Parameters:    nil,
@@ -34,7 +35,8 @@ type Config struct {
 	Mail          *MailConfig
 	Server        *ServerConfig
 	DingTalk      *DingTalkSDKConfig
-	FeiShu		  *FeiShuSdkConfig
+	FeiShu        *FeiShuSdkConfig
+	ScheduleTime  *ScheduleTimeConfig
 	Logs          *map[string]LogConfig
 	Application   *ApplicationConfig
 	Parameters    *ParameterConfig
@@ -44,6 +46,10 @@ type Config struct {
 	Sentry        *SentryConfig
 	SkyWalking    *SkyWalkingConfig
 	SMS           *SMSConfig
+}
+
+type ScheduleTimeConfig struct {
+	Interval string
 }
 
 type MysqlConfig struct {
@@ -116,9 +122,9 @@ type DingTalkSDKConfig struct {
 }
 
 type FeiShuSdkConfig struct {
-	AppId string
-	AppSecret string
-	EventEncryptKey string
+	AppId            string
+	AppSecret        string
+	EventEncryptKey  string
 	EventVerifyToken string
 }
 
