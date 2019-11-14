@@ -49,7 +49,9 @@ type Config struct {
 }
 
 type ScheduleTimeConfig struct {
-	Interval string //时间区间字符串,提供给time.ParseDuration函数使用
+	MinInterval    int //时间区间分钟字段的值,提供给time.ParseDuration函数使用
+	HourInterval   int //时间区间小时字段的值,提供给time.ParseDuration函数使用
+	SecondInterval int //期间区间秒字段的值,提供给time.ParseDuration函数使用
 }
 
 //mq配置
