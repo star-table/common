@@ -16,7 +16,8 @@ var conf Config = Config{
 	Mail:          nil,
 	Server:        nil,
 	DingTalk:      nil,
-	FeiShu: 	   nil,
+	FeiShu:        nil,
+	ScheduleTime:  nil,
 	Logs:          nil,
 	Application:   nil,
 	Parameters:    nil,
@@ -29,23 +30,30 @@ var conf Config = Config{
 
 type Config struct {
 	Viper         *viper.Viper
-	Mysql         *MysqlConfig
-	Redis         *RedisConfig
-	Mail          *MailConfig
-	Server        *ServerConfig
-	DingTalk      *DingTalkSDKConfig
-	FeiShu		  *FeiShuSdkConfig
+	Mysql         *MysqlConfig        //数据库配置
+	Redis         *RedisConfig        //redis配置
+	Mail          *MailConfig         //邮件配置
+	Server        *ServerConfig       //服务配置
+	DingTalk      *DingTalkSDKConfig  //钉钉配置
+	FeiShu        *FeiShuSdkConfig    //飞书配置
+	ScheduleTime  *ScheduleTimeConfig //定时时间配置
 	Logs          *map[string]LogConfig
-	Application   *ApplicationConfig
-	Parameters    *ParameterConfig
-	Mq            *MQConfig
-	OSS           *OSSConfig
-	ElasticSearch *ElasticSearchConfig
-	Sentry        *SentryConfig
-	SkyWalking    *SkyWalkingConfig
-	SMS           *SMSConfig
+	Application   *ApplicationConfig   //应用配置
+	Parameters    *ParameterConfig     //参数配置
+	Mq            *MQConfig            //mq配置
+	OSS           *OSSConfig           //oss配置
+	ElasticSearch *ElasticSearchConfig //es配置
+	Sentry        *SentryConfig        //sentry配置
+	SkyWalking    *SkyWalkingConfig    //skywalking配置
+	SMS           *SMSConfig           //消息配置
 }
 
+type ScheduleTimeConfig struct {
+	ScheduleDailyProjectReportSecondInterval int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
+	ScheduleDailyProjectReportTriggerCron    string //配置项目日报每日触发时间
+}
+
+//mq配置
 type MysqlConfig struct {
 	Host     string
 	Port     int
@@ -54,6 +62,7 @@ type MysqlConfig struct {
 	Database string
 }
 
+//redis配置
 type RedisConfig struct {
 	Host           string
 	Port           int
@@ -64,6 +73,7 @@ type RedisConfig struct {
 	MaxIdleTimeout int
 }
 
+//oss配置
 type OSSConfig struct {
 	BucketName      string
 	EndPoint        string
@@ -86,6 +96,7 @@ type OSSPolicyInfo struct {
 	MaxFileSize int64
 }
 
+//邮件配置
 type MailConfig struct {
 	Usr  string
 	Pwd  string
@@ -116,9 +127,9 @@ type DingTalkSDKConfig struct {
 }
 
 type FeiShuSdkConfig struct {
-	AppId string
-	AppSecret string
-	EventEncryptKey string
+	AppId            string
+	AppSecret        string
+	EventEncryptKey  string
 	EventVerifyToken string
 }
 
@@ -163,11 +174,23 @@ type KafkaMQConfig struct {
 }
 
 type TopicConfig struct {
-	IssueTrends   TopicConfigInfo
-	ProjectTrends TopicConfigInfo
+	IssueTrends               TopicConfigInfo
+	ProjectTrends             TopicConfigInfo
+	DailyProjectReportProject DailyProjectReportProjectInfo
+	DailyProjectReportMsg     DailyProjectReportMsgInfo
 }
 
 type TopicConfigInfo struct {
+	Topic   string
+	GroupId string
+}
+
+type DailyProjectReportProjectInfo struct {
+	Topic   string
+	GroupId string
+}
+
+type DailyProjectReportMsgInfo struct {
 	Topic   string
 	GroupId string
 }
@@ -205,6 +228,18 @@ type SMSConfig struct {
 
 func GetSMSConfig() *SMSConfig {
 	return conf.SMS
+}
+
+func GetScheduleTime() *ScheduleTimeConfig {
+	return conf.ScheduleTime
+}
+
+func GetMqDailyProjectReportProjectTopicConfig() DailyProjectReportProjectInfo {
+	return conf.Mq.Topics.DailyProjectReportProject
+}
+
+func GetMqDailyProjectReportMsgTopicConfig() DailyProjectReportMsgInfo {
+	return conf.Mq.Topics.DailyProjectReportMsg
 }
 
 func GetMqIssueTrendsTopicConfig() TopicConfigInfo {
