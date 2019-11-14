@@ -49,7 +49,7 @@ type Config struct {
 }
 
 type ScheduleTimeConfig struct {
-	Interval string
+	Interval string //时间区间字符串,提供给time.ParseDuration函数使用
 }
 
 //mq配置
