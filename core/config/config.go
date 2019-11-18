@@ -51,6 +51,8 @@ type Config struct {
 type ScheduleTimeConfig struct {
 	ScheduleDailyProjectReportSecondInterval int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
 	ScheduleDailyProjectReportTriggerCron    string //配置项目日报每日触发时间
+
+	ScheduleIssueRemindMaxCompensationTime  int        //任务提醒最大补偿时长，单位分钟（当服务重启时，会有一段时间范围导致丢失，这时要对其补偿，该字段定义最大补偿时长）
 }
 
 //mq配置
@@ -174,23 +176,19 @@ type KafkaMQConfig struct {
 }
 
 type TopicConfig struct {
+	//任务动态
 	IssueTrends               TopicConfigInfo
+	//任务提醒
+	IssueRemind				  TopicConfigInfo
+	//项目动态
 	ProjectTrends             TopicConfigInfo
-	DailyProjectReportProject DailyProjectReportProjectInfo
-	DailyProjectReportMsg     DailyProjectReportMsgInfo
+	//项目日报
+	DailyProjectReportProject TopicConfigInfo
+	//项目日报Msg
+	DailyProjectReportMsg     TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
-	Topic   string
-	GroupId string
-}
-
-type DailyProjectReportProjectInfo struct {
-	Topic   string
-	GroupId string
-}
-
-type DailyProjectReportMsgInfo struct {
 	Topic   string
 	GroupId string
 }
@@ -234,11 +232,11 @@ func GetScheduleTime() *ScheduleTimeConfig {
 	return conf.ScheduleTime
 }
 
-func GetMqDailyProjectReportProjectTopicConfig() DailyProjectReportProjectInfo {
+func GetMqDailyProjectReportProjectTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.DailyProjectReportProject
 }
 
-func GetMqDailyProjectReportMsgTopicConfig() DailyProjectReportMsgInfo {
+func GetMqDailyProjectReportMsgTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.DailyProjectReportMsg
 }
 
