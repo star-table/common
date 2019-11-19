@@ -3,6 +3,7 @@ package threadlocal
 import (
 	"gitea.bjx.cloud/allstar/common/core/consts"
 	"gitea.bjx.cloud/allstar/common/core/model"
+	"gitea.bjx.cloud/allstar/common/core/util/uuid"
 	"github.com/jtolds/gls"
 )
 
@@ -27,4 +28,10 @@ func GetTraceId() string {
 		}
 	}
 	return ""
+}
+
+//往threadlocal中设置UUID类型的 traceId
+func SetTraceId() {
+
+	Mgr.SetValues(gls.Values{consts.TraceIdKey: uuid.NewUuid()}, func() {})
 }
