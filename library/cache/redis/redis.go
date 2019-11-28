@@ -311,6 +311,21 @@ func (rp *Proxy) HMGet(key string, fields ...interface{}) (map[string]*string, e
 	return result, nil
 }
 
+func (rp *Proxy) HMSet(key string, fieldValue map[string]string) error {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return e
+	}
+	args := []interface{}{}
+	args = append(args, key)
+	for k, v := range fieldValue {
+		args = append(append(args, k), v)
+	}
+	_, err := conn.Do("HMSET", args...)
+	return err
+}
+
 func Connect() (redis.Conn, error) {
 	return GetRedisConn(), nil
 }

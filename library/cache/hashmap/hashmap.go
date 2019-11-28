@@ -186,8 +186,28 @@ func (c *CacheMap) HMGet(key string, fields ...interface{}) (map[string]*string,
 	}
 	for k, v := range *mapRes {
 		if ok, _ = slice.Contain(fields, k); ok {
-			result[k] = &v
+			trueValue := v
+			result[k] = &trueValue
 		}
 	}
 	return result, nil
+}
+
+func (c *CacheMap) HMSet(key string, fieldValue map[string]string) error {
+	mid, ok := c.Cache.Load(key)
+	if !ok {
+		c.Cache.Store(key, json.ToJsonIgnoreError(fieldValue))
+	} else {
+		mapRes := &HashType{}
+		err := json.FromJson(mid.(string), mapRes)
+		if err != nil {
+			return err
+		}
+		for k, v := range fieldValue {
+			(*mapRes)[k] = v
+		}
+		c.Cache.Store(key, json.ToJsonIgnoreError(mapRes))
+	}
+
+	return nil
 }

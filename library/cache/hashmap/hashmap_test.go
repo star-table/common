@@ -44,4 +44,11 @@ func TestCacheMap_HSet(t *testing.T) {
 	res, err := c.HMGet(key, "a", "b", "c")
 	t.Log(json.ToJsonIgnoreError(res), err)
 	assert.Equal(t, err, nil)
+	t.Log(c.HMSet(key, map[string]string{
+		"h": "h",
+		"i": "i",
+	}))
+	res1, err := c.HMGet(key, "a", "b", "c", "h", "i")
+	t.Log(json.ToJsonIgnoreError(res1), err)
+	assert.Equal(t, err, nil)
 }

@@ -22,6 +22,7 @@ type Cache interface {
 	HDel(key string, fields ...interface{}) (int64, error)
 	HExists(key, field string) (bool, error)
 	HMGet(key string, fields ...interface{}) (map[string]*string, error)
+	HMSet(key string, fieldValue map[string]string) error
 
 	TryGetDistributedLock(key string, v string) (bool, error)
 	ReleaseDistributedLock(key string, v string) (bool, error)
@@ -100,4 +101,8 @@ func HExists(key, field string) (bool, error) {
 
 func HMGet(key string, fields ...interface{}) (map[string]*string, error) {
 	return getCache().HMGet(key, fields)
+}
+
+func HMSet(key string, fieldValue map[string]string) error {
+	return getCache().HMSet(key, fieldValue)
 }
