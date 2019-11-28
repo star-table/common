@@ -12,6 +12,8 @@ import (
 var mu sync.Mutex
 var single Proxy
 
+type HashType map[string]string
+
 const (
 	_LockDistributedLua = "local v;" +
 		"v = redis.call('setnx',KEYS[1],ARGV[1]);" +
@@ -101,8 +103,8 @@ func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
 	}
 	list := rs.([]interface{})
 	resultList := make([]string, 0)
-	for _, v := range list{
-		if bytes, ok := v.([]byte); ok{
+	for _, v := range list {
+		if bytes, ok := v.([]byte); ok {
 			resultList = append(resultList, string(bytes))
 		}
 	}
@@ -211,6 +213,102 @@ func (rp *Proxy) ReleaseDistributedLock(key string, v string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (rp *Proxy) HGet(key, field string) (string, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return "", e
+	}
+	rs, err := conn.Do("HGET", key, field)
+	if err != nil {
+		return "", err
+	}
+	if rs == nil {
+		return "", err
+	}
+	return string(rs.([]byte)), nil
+}
+
+func (rp *Proxy) HSet(key, field, value string) error {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return e
+	}
+	_, err := conn.Do("HSET", key, field, value)
+	return err
+}
+
+func (rp *Proxy) HDel(key string, fields ...interface{}) (int64, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return 0, e
+	}
+	args := []interface{}{}
+	args = append(append(args, key), fields...)
+	rs, err := conn.Do("HDEL", args)
+	if err != nil {
+		return 0, err
+	}
+	if rs == nil {
+		return 0, err
+	}
+	return rs.(int64), nil
+}
+
+func (rp *Proxy) HExists(key, field string) (bool, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return false, e
+	}
+	rs, err := conn.Do("HEXISTS", key, field)
+	if err != nil {
+		return false, err
+	}
+	if rs == nil {
+		return false, err
+	}
+	return rs.(int64) == 1, err
+}
+
+func (rp *Proxy) HMGet(key string, fields ...interface{}) (map[string]*string, error) {
+	result := map[string]*string{}
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return result, e
+	}
+	fields = append([]interface{}{key}, fields...)
+	rs, err := conn.Do("HMGET", fields...)
+	if err != nil {
+		return result, err
+	}
+	if rs == nil {
+		return result, nil
+	}
+	keys := make([]string, len(fields)-1)
+	for i, k := range fields {
+		if i == 0 {
+			continue
+		}
+		keys[i-1] = k.(string)
+	}
+
+	if datas, ok := rs.([]interface{}); ok {
+		for i, data := range datas {
+			if data == nil {
+				result[keys[i]] = nil
+			} else {
+				dataStr := string(data.([]byte))
+				result[keys[i]] = &dataStr
+			}
+		}
+	}
+	return result, nil
 }
 
 func Connect() (redis.Conn, error) {

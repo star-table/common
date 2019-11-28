@@ -17,6 +17,11 @@ type Cache interface {
 	Expire(key string, expire int64) (bool, error)
 	Incrby(key string, v int64) (int64, error)
 	MGet(keys ...interface{}) ([]string, error)
+	HGet(key, field string) (string, error)
+	HSet(key, field, value string) error
+	HDel(key string, fields ...interface{}) (int64, error)
+	HExists(key, field string) (bool, error)
+	HMGet(key string, fields ...interface{}) (map[string]*string, error)
 
 	TryGetDistributedLock(key string, v string) (bool, error)
 	ReleaseDistributedLock(key string, v string) (bool, error)
@@ -73,6 +78,26 @@ func ReleaseDistributedLock(key string, v string) (bool, error) {
 	return getCache().ReleaseDistributedLock(key, v)
 }
 
-func MGet(keys ...interface{}) ([]string, error){
+func MGet(keys ...interface{}) ([]string, error) {
 	return getCache().MGet(keys)
+}
+
+func HGet(key, field string) (string, error) {
+	return getCache().HGet(key, field)
+}
+
+func HSet(key, field, value string) error {
+	return getCache().HSet(key, field, value)
+}
+
+func HDel(key string, fields ...interface{}) (int64, error) {
+	return getCache().HDel(key, fields)
+}
+
+func HExists(key, field string) (bool, error) {
+	return getCache().HExists(key, field)
+}
+
+func HMGet(key string, fields ...interface{}) (map[string]*string, error) {
+	return getCache().HMGet(key, fields)
 }
