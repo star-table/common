@@ -3,6 +3,8 @@ package redis
 import (
 	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/magiconair/properties/assert"
 	"math/rand"
 	"testing"
 	"time"
@@ -44,9 +46,9 @@ func TestProxy_TryGetDistributedLock(t *testing.T) {
 	}
 }
 
-func Test_Pool(t *testing.T){
+func Test_Pool(t *testing.T) {
 	config.LoadConfig("F:\\workspace-golang-polaris\\polaris-backend\\config", "application")
-	for i := 0; i < 1000; i ++{
+	for i := 0; i < 1000; i++ {
 		go getConn()
 	}
 	fmt.Print("阻塞")
@@ -54,14 +56,14 @@ func Test_Pool(t *testing.T){
 	time.Sleep(time.Duration(10) * time.Second)
 }
 
-func getConn(){
+func getConn() {
 	conn := GetRedisConn()
 	time.Sleep(time.Duration(1) * time.Second)
 
 	conn.Close()
 }
 
-func Test_MGet(t *testing.T){
+func Test_MGet(t *testing.T) {
 	config.LoadUnitTestConfig()
 	rp := GetProxy()
 
@@ -70,4 +72,25 @@ func Test_MGet(t *testing.T){
 	v, e := rp.MGet("3", "4")
 	t.Log(e)
 	t.Log(v)
+}
+
+func TestProxy_HGet(t *testing.T) {
+	config.LoadUnitTestConfig()
+	rp := GetProxy()
+
+	key := "abc"
+	t.Log(rp.HSet(key, "a", "a"))
+	t.Log(rp.HSet(key, "b", "b"))
+	t.Log(rp.HGet(key, "a"))
+	res, err := rp.HMGet(key, "a", "b", "c", "a")
+	t.Log(json.ToJsonIgnoreError(res), err)
+	assert.Equal(t, err, nil)
+	t.Log(rp.HMSet(key, map[string]string{
+		"h": "h",
+		"i": "i",
+	}))
+	res1, err := rp.HMGet(key, "a", "b", "c", "h", "i")
+	t.Log(json.ToJsonIgnoreError(res1), err)
+	assert.Equal(t, err, nil)
+
 }

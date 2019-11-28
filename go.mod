@@ -15,6 +15,7 @@ require (
 	github.com/henrylee2cn/goutil v0.0.0-20190701081944-69b028c17642 // indirect
 	github.com/json-iterator/go v1.1.6
 	github.com/jtolds/gls v4.20.0+incompatible
+	github.com/magiconair/properties v1.8.0
 	github.com/mozillazg/go-pinyin v0.15.0
 	github.com/nyaruka/phonenumbers v1.0.43 // indirect
 	github.com/olivere/elastic/v7 v7.0.6

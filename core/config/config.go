@@ -52,7 +52,7 @@ type ScheduleTimeConfig struct {
 	ScheduleDailyProjectReportSecondInterval int    //期间区间秒字段的值,提供给time.ParseDuration函数使用
 	ScheduleDailyProjectReportTriggerCron    string //配置项目日报每日触发时间
 
-	ScheduleIssueRemindMaxCompensationTime  int        //任务提醒最大补偿时长，单位分钟（当服务重启时，会有一段时间范围导致丢失，这时要对其补偿，该字段定义最大补偿时长）
+	ScheduleIssueRemindMaxCompensationTime int //任务提醒最大补偿时长，单位分钟（当服务重启时，会有一段时间范围导致丢失，这时要对其补偿，该字段定义最大补偿时长）
 }
 
 //mq配置
@@ -177,15 +177,15 @@ type KafkaMQConfig struct {
 
 type TopicConfig struct {
 	//任务动态
-	IssueTrends               TopicConfigInfo
+	IssueTrends TopicConfigInfo
 	//任务提醒
-	IssueRemind				  TopicConfigInfo
+	IssueRemind TopicConfigInfo
 	//项目动态
-	ProjectTrends             TopicConfigInfo
+	ProjectTrends TopicConfigInfo
 	//项目日报
 	DailyProjectReportProject TopicConfigInfo
 	//项目日报Msg
-	DailyProjectReportMsg     TopicConfigInfo
+	DailyProjectReportMsg TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
@@ -351,7 +351,8 @@ func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
 }
 
 func LoadUnitTestConfig() {
-	configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
+	//configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
+	configPath := "F:\\polaris-backend-clone\\config"
 	configName := "application.common"
 	env := "local"
 	for _, arg := range flag.Args() {
