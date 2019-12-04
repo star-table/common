@@ -35,8 +35,10 @@ func (c *CacheMap) Get(key string) (string, error) {
 	return "", nil
 }
 
-func (c *CacheMap) Del(key string) (int64, error) {
-	c.Cache.Delete(key)
+func (c *CacheMap) Del(keys ...interface{}) (int64, error) {
+	for _, key := range keys{
+		c.Cache.Delete(key)
+	}
 	return 1, nil
 }
 

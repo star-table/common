@@ -352,7 +352,7 @@ func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
 
 func LoadUnitTestConfig() {
 	//configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
-	configPath := "F:\\polaris-backend-clone\\config"
+	configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
 	configName := "application.common"
 	env := "local"
 	for _, arg := range flag.Args() {

@@ -94,3 +94,16 @@ func TestProxy_HGet(t *testing.T) {
 	assert.Equal(t, err, nil)
 
 }
+
+func TestProxy_Del(t *testing.T) {
+	config.LoadUnitTestConfig()
+	rp := GetProxy()
+
+	t.Log(rp.Set("a", "a"))
+	t.Log(rp.Set("b", "b"))
+	t.Log(rp.Set("c", "c"))
+	t.Log(rp.MGet("a", "b", "c"))
+	t.Log(rp.Del("a"))
+	t.Log(rp.Del("b", "c"))
+	t.Log(rp.MGet("a", "b", "c"))
+}

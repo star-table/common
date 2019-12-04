@@ -12,7 +12,7 @@ type Cache interface {
 	Set(key string, value string) error
 	SetEx(key string, value string, second int64) error
 	Get(key string) (string, error)
-	Del(key string) (int64, error)
+	Del(keys ...interface{}) (int64, error)
 	Exist(key string) (bool, error)
 	Expire(key string, expire int64) (bool, error)
 	Incrby(key string, v int64) (int64, error)
@@ -55,8 +55,8 @@ func SetEx(key string, value string, second int64) error {
 	return getCache().SetEx(key, value, second)
 }
 
-func Del(key string) (int64, error) {
-	return getCache().Del(key)
+func Del(keys ...interface{}) (int64, error) {
+	return getCache().Del(keys...)
 }
 
 func Exist(key string) (bool, error) {

@@ -111,13 +111,13 @@ func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
 	return resultList, nil
 }
 
-func (rp *Proxy) Del(key string) (int64, error) {
+func (rp *Proxy) Del(keys ...interface{}) (int64, error) {
 	conn, e := Connect()
 	defer Close(conn)
 	if e != nil {
 		return 0, e
 	}
-	rs, err := conn.Do("Del", key)
+	rs, err := conn.Do("Del", keys...)
 	if err != nil {
 		return 0, err
 	}
