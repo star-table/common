@@ -186,6 +186,8 @@ type TopicConfig struct {
 	DailyProjectReportProject TopicConfigInfo
 	//项目日报Msg
 	DailyProjectReportMsg TopicConfigInfo
+	//导入任务
+	ImportIssue TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
@@ -247,6 +249,11 @@ func GetMqIssueTrendsTopicConfig() TopicConfigInfo {
 func GetMqProjectTrendsTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.ProjectTrends
 }
+
+func GetMqImportIssueTopicConfig() TopicConfigInfo {
+	return conf.Mq.Topics.ImportIssue
+}
+
 
 func GetProjectCoverPolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.ProjectCover
