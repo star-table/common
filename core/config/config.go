@@ -90,6 +90,7 @@ type OSSPolicyConfig struct {
 	ProjectCover   OSSPolicyInfo
 	IssueResource  OSSPolicyInfo
 	IssueInputFile OSSPolicyInfo
+	ProjectResource OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
@@ -188,6 +189,10 @@ type TopicConfig struct {
 	DailyProjectReportMsg TopicConfigInfo
 	//导入任务
 	ImportIssue TopicConfigInfo
+	//新增组织成员
+	AddOrgUser TopicConfigInfo
+	//移除组织成员
+	RemoveOrgUser TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
@@ -254,6 +259,13 @@ func GetMqImportIssueTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.ImportIssue
 }
 
+func GetMqAddOrgMemberConfig() TopicConfigInfo{
+	return conf.Mq.Topics.AddOrgUser
+}
+
+func GetMqRemoveOrgMemberConfig() TopicConfigInfo{
+	return conf.Mq.Topics.RemoveOrgUser
+}
 
 func GetProjectCoverPolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.ProjectCover
@@ -265,6 +277,10 @@ func GetIssueResourcePolicyConfig() OSSPolicyInfo {
 
 func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.IssueInputFile
+}
+
+func GetProjectResourcePolicyConfig() OSSPolicyInfo {
+	return conf.OSS.Policies.ProjectResource
 }
 
 func GetSentryConfig() *SentryConfig {
