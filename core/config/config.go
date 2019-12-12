@@ -191,6 +191,8 @@ type TopicConfig struct {
 	ImportIssue TopicConfigInfo
 	//组织成员变动
 	OrgMemberChange TopicConfigInfo
+	//飞书回调消费
+	FeiShuCallBack TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
@@ -251,6 +253,10 @@ func GetMqIssueTrendsTopicConfig() TopicConfigInfo {
 
 func GetMqProjectTrendsTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.ProjectTrends
+}
+
+func GetMqFeiShuCallBackTopicConfig() TopicConfigInfo {
+	return conf.Mq.Topics.FeiShuCallBack
 }
 
 func GetMqImportIssueTopicConfig() TopicConfigInfo {
