@@ -91,12 +91,18 @@ type OSSPolicyConfig struct {
 	IssueResource  OSSPolicyInfo
 	IssueInputFile OSSPolicyInfo
 	ProjectResource OSSPolicyInfo
+	CompatTest		OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
+	//有效期
 	Expire      int64
+	//目录
 	Dir         string
+	//最大文件大小
 	MaxFileSize int64
+	//回调地址
+	CallbackUrl string
 }
 
 //邮件配置
@@ -281,6 +287,10 @@ func GetIssueInputFilePolicyConfig() OSSPolicyInfo {
 
 func GetProjectResourcePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.ProjectResource
+}
+
+func GetCompatTestPolicyConfig() OSSPolicyInfo{
+	return conf.OSS.Policies.CompatTest
 }
 
 func GetSentryConfig() *SentryConfig {
