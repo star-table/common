@@ -4,10 +4,9 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
-	"fmt"
+	"gitea.bjx.cloud/allstar/common/core/config"
 	"gitea.bjx.cloud/allstar/common/core/util/json"
 	"github.com/polaris-team/dingtalk-sdk-golang/encrypt"
-	"gitea.bjx.cloud/allstar/common/core/config"
 	"hash"
 	"io"
 	"strconv"
@@ -64,11 +63,10 @@ func PostPolicy(dir string, expire int64, maxFileSize int64) *PostPolicyInfo {
 
 func GeneratePostPolicy(bucket string, expire time.Time, maxFileSize int64, startsWith string, callback string) string {
 	formatedExpiration := expire.UTC().Format("2006-01-02T15:04:05.999Z07:00")
-	jsonizedExpiration := fmt.Sprintf("\"expiration\":\"%s\"", formatedExpiration)
 
 	conditions := []interface{}{
 		map[string]interface{}{"bucket":bucket},
-		[]interface{}{"content-length-range", 0, strconv.FormatInt(maxFileSize, 10)},
+		[]interface{}{"content-length-range", 0, maxFileSize},
 	}
 
 	//前缀
@@ -82,10 +80,10 @@ func GeneratePostPolicy(bucket string, expire time.Time, maxFileSize int64, star
 	}
 
 	jsonizedConds := map[string]interface{}{
+		"expiration": formatedExpiration,
 		"conditions": conditions,
 	}
-	jsonizedCondsJson := json.ToJsonIgnoreError(jsonizedConds)
-	postPolicy := fmt.Sprintf("{%s,%s}", jsonizedExpiration, jsonizedCondsJson)
+	postPolicy := json.ToJsonIgnoreError(jsonizedConds)
 	return postPolicy
 }
 
