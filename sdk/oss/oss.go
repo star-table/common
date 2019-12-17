@@ -66,11 +66,21 @@ func PutObjectWithURL(signUrl string, fileSuffix string, reader io.Reader) error
 	return nil
 }
 
-func GetObjectUrl(fileName string, fileSuffix string) string {
+func GetObjectUrl(key string, expiredInSec int64) (string, error) {
 	oc := config.GetOSSConfig()
 	if oc == nil {
 		panic("oss configuration is missing!")
 	}
 
-	return "https://" + oc.BucketName + "." + oc.EndPoint + "/" + fileName + "." + fileSuffix
+	client, err := oss.New(oc.EndPoint, oc.AccessKeyId, oc.AccessKeySecret)
+	if err != nil {
+		return "", err
+	}
+
+	bucket, err := client.Bucket(oc.BucketName)
+	if err != nil {
+		return "", err
+	}
+
+	return bucket.SignURL(key, oss.HTTPGet, expiredInSec)
 }
