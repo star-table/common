@@ -1,9 +1,9 @@
 package oss
 
 import (
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"gitea.bjx.cloud/allstar/common/core/config"
 	"gitea.bjx.cloud/allstar/common/core/consts"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"io"
 )
 
