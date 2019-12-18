@@ -92,6 +92,7 @@ type OSSPolicyConfig struct {
 	IssueInputFile OSSPolicyInfo
 	ProjectResource OSSPolicyInfo
 	CompatTest		OSSPolicyInfo
+	UserAvatar		OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
@@ -291,6 +292,10 @@ func GetProjectResourcePolicyConfig() OSSPolicyInfo {
 
 func GetCompatTestPolicyConfig() OSSPolicyInfo{
 	return conf.OSS.Policies.CompatTest
+}
+
+func GetUserAvatarPolicyConfig() OSSPolicyInfo{
+	return conf.OSS.Policies.UserAvatar
 }
 
 func GetSentryConfig() *SentryConfig {
