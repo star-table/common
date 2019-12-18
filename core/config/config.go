@@ -87,19 +87,19 @@ type OSSConfig struct {
 }
 
 type OSSPolicyConfig struct {
-	ProjectCover   OSSPolicyInfo
-	IssueResource  OSSPolicyInfo
-	IssueInputFile OSSPolicyInfo
+	ProjectCover    OSSPolicyInfo
+	IssueResource   OSSPolicyInfo
+	IssueInputFile  OSSPolicyInfo
 	ProjectResource OSSPolicyInfo
-	CompatTest		OSSPolicyInfo
-	UserAvatar		OSSPolicyInfo
+	CompatTest      OSSPolicyInfo
+	UserAvatar      OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
 	//有效期
-	Expire      int64
+	Expire int64
 	//目录
-	Dir         string
+	Dir string
 	//最大文件大小
 	MaxFileSize int64
 	//回调地址
@@ -270,7 +270,7 @@ func GetMqImportIssueTopicConfig() TopicConfigInfo {
 	return conf.Mq.Topics.ImportIssue
 }
 
-func GetMqOrgMemberChangeConfig() TopicConfigInfo{
+func GetMqOrgMemberChangeConfig() TopicConfigInfo {
 	return conf.Mq.Topics.OrgMemberChange
 }
 
@@ -290,11 +290,11 @@ func GetProjectResourcePolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.ProjectResource
 }
 
-func GetCompatTestPolicyConfig() OSSPolicyInfo{
+func GetCompatTestPolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.CompatTest
 }
 
-func GetUserAvatarPolicyConfig() OSSPolicyInfo{
+func GetUserAvatarPolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.UserAvatar
 }
 
@@ -390,7 +390,7 @@ func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
 
 func LoadUnitTestConfig() {
 	//configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
-	configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
+	configPath := "F:\\polaris-backend-clone\\config"
 	configName := "application.common"
 	env := "local"
 	for _, arg := range flag.Args() {
