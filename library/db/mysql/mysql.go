@@ -52,11 +52,15 @@ type Domain interface {
 }
 
 func Close(conn sqlbuilder.Database, tx sqlbuilder.Tx) {
-	if err := conn.Close(); err != nil {
-		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
+	if conn != nil{
+		if err := conn.Close(); err != nil {
+			logger.GetDefaultLogger().Error(strs.ObjectToString(err))
+		}
 	}
-	if err := tx.Close(); err != nil {
-		logger.GetDefaultLogger().Error(strs.ObjectToString(err))
+	if tx != nil{
+		if err := tx.Close(); err != nil {
+			logger.GetDefaultLogger().Error(strs.ObjectToString(err))
+		}
 	}
 }
 

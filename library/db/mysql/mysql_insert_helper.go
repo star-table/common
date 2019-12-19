@@ -9,8 +9,10 @@ import (
 func Insert(obj Domain) error {
 	conn, err := GetConnect()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+			}
 		}
 	}()
 	if err != nil {
@@ -26,8 +28,10 @@ func Insert(obj Domain) error {
 func InsertReturnId(obj Domain) (interface{}, error) {
 	conn, err := GetConnect()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+			}
 		}
 	}()
 	if err != nil {
@@ -78,8 +82,10 @@ func TransBatchInsert(tx sqlbuilder.Tx, obj Domain, objs []interface{}) error {
 func BatchInsert(obj Domain, objs []interface{}) error {
 	conn, err := GetConnect()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+			}
 		}
 	}()
 	if err != nil {

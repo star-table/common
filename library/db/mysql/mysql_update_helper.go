@@ -11,8 +11,10 @@ import (
 func Update(obj Domain) error {
 	conn, err := GetConnect()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+			}
 		}
 	}()
 	if err != nil {
@@ -44,8 +46,10 @@ func UpdateSmart(table string, id int64, upd Upd) error {
 func UpdateSmartWithCond(table string, cond db.Cond, upd Upd) (int64, error) {
 	conn, err := GetConnect()
 	defer func() {
-		if err := conn.Close(); err != nil {
-			logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+		if conn != nil {
+			if err := conn.Close(); err != nil {
+				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
+			}
 		}
 	}()
 	if err != nil {
