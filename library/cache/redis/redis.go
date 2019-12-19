@@ -249,7 +249,7 @@ func (rp *Proxy) HDel(key string, fields ...interface{}) (int64, error) {
 	}
 	args := []interface{}{}
 	args = append(append(args, key), fields...)
-	rs, err := conn.Do("HDEL", args)
+	rs, err := conn.Do("HDEL", args...)
 	if err != nil {
 		return 0, err
 	}

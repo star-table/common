@@ -81,6 +81,7 @@ func TestProxy_HGet(t *testing.T) {
 	key := "abc"
 	t.Log(rp.HSet(key, "a", "a"))
 	t.Log(rp.HSet(key, "b", "b"))
+	t.Log(rp.HDel(key, "a"))
 	t.Log(rp.HGet(key, "a"))
 	res, err := rp.HMGet(key, "a", "b", "c", "a")
 	t.Log(json.ToJsonIgnoreError(res), err)
