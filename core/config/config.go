@@ -141,6 +141,15 @@ type FeiShuSdkConfig struct {
 	AppSecret        string
 	EventEncryptKey  string
 	EventVerifyToken string
+	CardJumpLink CardJumpLink
+}
+
+//飞书卡片跳转链接
+type CardJumpLink struct {
+	//项目日报pc跳转url
+	ProjectDailyPcUrl string
+	//个人日报pc跳转url
+	PersonalDailyPcUrl string
 }
 
 type LogConfig struct {
