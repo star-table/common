@@ -35,6 +35,8 @@ func GetConnect() (sqlbuilder.Database, error) {
 				Options: map[string]string{
 					"parseTime": "true",
 					"loc":       "Asia/Shanghai",
+					"charset":   "utf8mb4",
+					"collation": "utf8mb4_unicode_ci",
 				},
 			}
 		}
