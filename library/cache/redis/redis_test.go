@@ -6,6 +6,7 @@ import (
 	"gitea.bjx.cloud/allstar/common/core/util/json"
 	"github.com/magiconair/properties/assert"
 	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -107,4 +108,20 @@ func TestProxy_Del(t *testing.T) {
 	t.Log(rp.Del("a"))
 	t.Log(rp.Del("b", "c"))
 	t.Log(rp.MGet("a", "b", "c"))
+}
+
+func TestProxy_Exist(t *testing.T) {
+	config.LoadUnitTestConfig()
+	rp := GetProxy()
+
+	//key := "abc"
+	//b := int64(1)
+	//t.Log(rp.HSet(key, strconv.FormatInt(b, 10), "bbbbb"))
+	//t.Log(rp.HGet(key, strconv.FormatInt(b, 10)))
+	//t.Log(rp.HDel(key, 1))
+	//t.Log(rp.HGet(key, strconv.FormatInt(b, 10)))
+	t.Log(rp.HSet("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10), "11"))
+	t.Log(rp.HGet("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10)))
+	t.Log(rp.HDel("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10)))
+	t.Log(rp.HGet("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10)))
 }

@@ -80,7 +80,7 @@ func ReleaseDistributedLock(key string, v string) (bool, error) {
 }
 
 func MGet(keys ...interface{}) ([]string, error) {
-	return getCache().MGet(keys)
+	return getCache().MGet(keys...)
 }
 
 func HGet(key, field string) (string, error) {
@@ -92,7 +92,7 @@ func HSet(key, field, value string) error {
 }
 
 func HDel(key string, fields ...interface{}) (int64, error) {
-	return getCache().HDel(key, fields)
+	return getCache().HDel(key, fields...)
 }
 
 func HExists(key, field string) (bool, error) {
@@ -100,7 +100,7 @@ func HExists(key, field string) (bool, error) {
 }
 
 func HMGet(key string, fields ...interface{}) (map[string]*string, error) {
-	return getCache().HMGet(key, fields)
+	return getCache().HMGet(key, fields...)
 }
 
 func HMSet(key string, fieldValue map[string]string) error {
