@@ -20,3 +20,11 @@ func Render(str string, params interface{}) (string, error) {
 	}
 	return buf.String(), nil
 }
+
+func RenderIgnoreError(str string, params interface{}) string {
+	afterRender, err := Render(str, params)
+	if err != nil{
+		return str
+	}
+	return afterRender
+}

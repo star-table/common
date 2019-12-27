@@ -108,6 +108,8 @@ type OSSPolicyInfo struct {
 
 //邮件配置
 type MailConfig struct {
+	//别名
+	Alias string
 	Usr  string
 	Pwd  string
 	Host string
