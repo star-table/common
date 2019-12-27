@@ -13,6 +13,7 @@ func TestAvailability(t *testing.T) {
 	if err == nil {
 		t.Log("successful")
 	} else {
+		t.Log(err)
 		t.Log("send failed")
 	}
 }
