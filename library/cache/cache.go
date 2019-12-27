@@ -107,3 +107,7 @@ func HMGet(key string, fields ...interface{}) (map[string]*string, error) {
 func HMSet(key string, fieldValue map[string]string) error {
 	return getCache().HMSet(key, fieldValue)
 }
+
+func HINCRBY(key string, field string, increment int64) (int64, error) {
+	return getCache().HINCRBY(key, field, increment)
+}
