@@ -125,3 +125,9 @@ func TestProxy_Exist(t *testing.T) {
 	t.Log(rp.HDel("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10)))
 	t.Log(rp.HGet("polaris:rolesvc:org_10101:user_10201:user_role_list_hash:1", strconv.FormatInt(0, 10)))
 }
+
+func TestProxy_HINCRBY(t *testing.T) {
+	config.LoadUnitTestConfig()
+	rp := GetProxy()
+	t.Log(rp.HINCRBY("aaa", "bbb", 1))
+}

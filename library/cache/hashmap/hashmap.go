@@ -36,7 +36,7 @@ func (c *CacheMap) Get(key string) (string, error) {
 }
 
 func (c *CacheMap) Del(keys ...interface{}) (int64, error) {
-	for _, key := range keys{
+	for _, key := range keys {
 		c.Cache.Delete(key)
 	}
 	return 1, nil
@@ -212,4 +212,25 @@ func (c *CacheMap) HMSet(key string, fieldValue map[string]string) error {
 	}
 
 	return nil
+}
+
+func (c *CacheMap) HINCRBY(key string, field string, increment int64) (int64, error) {
+	lock.Lock(key + field)
+	defer lock.Unlock(key + field)
+	exist, err := c.HExists(key, field)
+	if err != nil {
+		return 0, err
+	}
+	if !exist {
+		c.HSet(key, field, strconv.FormatInt(increment, 10))
+		return increment, nil
+	}
+	value, _ := c.HGet(key, field)
+	count, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	count += increment
+	c.HSet(key, field, strconv.FormatInt(count, 10))
+	return count, nil
 }

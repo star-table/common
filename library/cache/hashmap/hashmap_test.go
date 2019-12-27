@@ -3,6 +3,7 @@ package hashmap
 import (
 	"gitea.bjx.cloud/allstar/common/core/util/json"
 	"github.com/magiconair/properties/assert"
+	"strconv"
 	"testing"
 )
 
@@ -51,4 +52,9 @@ func TestCacheMap_HSet(t *testing.T) {
 	res1, err := c.HMGet(key, "a", "b", "c", "h", "i")
 	t.Log(json.ToJsonIgnoreError(res1), err)
 	assert.Equal(t, err, nil)
+}
+
+func TestCacheMap_HINCRBY(t *testing.T) {
+	count, err := strconv.ParseInt("11", 10, 64)
+	t.Log(count, err)
 }

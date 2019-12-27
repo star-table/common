@@ -23,6 +23,7 @@ type Cache interface {
 	HExists(key, field string) (bool, error)
 	HMGet(key string, fields ...interface{}) (map[string]*string, error)
 	HMSet(key string, fieldValue map[string]string) error
+	HINCRBY(key string, field string, increment int64) (int64, error)
 
 	TryGetDistributedLock(key string, v string) (bool, error)
 	ReleaseDistributedLock(key string, v string) (bool, error)

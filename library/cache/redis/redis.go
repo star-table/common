@@ -326,6 +326,20 @@ func (rp *Proxy) HMSet(key string, fieldValue map[string]string) error {
 	return err
 }
 
+func (rp *Proxy) HINCRBY(key string, field string, increment int64) (int64, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return 0, e
+	}
+
+	res, err := conn.Do("HINCRBY", key, field, increment)
+	if err != nil {
+		return 0, e
+	}
+	return res.(int64), nil
+}
+
 func Connect() (redis.Conn, error) {
 	return GetRedisConn(), nil
 }
