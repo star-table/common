@@ -26,6 +26,7 @@ var conf Config = Config{
 	ElasticSearch: nil,
 	Sentry:        nil,
 	SMS:           nil,
+	MQTT:		   nil,
 }
 
 type Config struct {
@@ -46,6 +47,7 @@ type Config struct {
 	Sentry        *SentryConfig        //sentry配置
 	SkyWalking    *SkyWalkingConfig    //skywalking配置
 	SMS           *SMSConfig           //消息配置
+	MQTT		  *MQTTConfig		   //mqtt配置
 }
 
 type ScheduleTimeConfig struct {
@@ -247,6 +249,17 @@ type SMSConfig struct {
 	AccessKeyId     string
 	AccessKeySecret string
 	Region          string
+}
+
+type MQTTConfig struct {
+	//host
+	Host string
+	//端口
+	Port int
+	//key
+	Key string
+	//channel
+	Channel string
 }
 
 func GetSMSConfig() *SMSConfig {
