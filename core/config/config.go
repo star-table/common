@@ -254,12 +254,12 @@ type SMSConfig struct {
 type MQTTConfig struct {
 	//host
 	Host string
-	//端口
-	Port int
 	//key
-	Key string
+	SecretKey string
 	//channel
 	Channel string
+	//是否开启
+	Enable bool
 }
 
 func GetSMSConfig() *SMSConfig {
@@ -268,6 +268,10 @@ func GetSMSConfig() *SMSConfig {
 
 func GetScheduleTime() *ScheduleTimeConfig {
 	return conf.ScheduleTime
+}
+
+func GetMQTTConfig() *MQTTConfig {
+	return conf.MQTT
 }
 
 func GetMqDailyProjectReportProjectTopicConfig() TopicConfigInfo {
