@@ -26,7 +26,7 @@ var conf Config = Config{
 	ElasticSearch: nil,
 	Sentry:        nil,
 	SMS:           nil,
-	MQTT:		   nil,
+	MQTT:          nil,
 }
 
 type Config struct {
@@ -47,7 +47,7 @@ type Config struct {
 	Sentry        *SentryConfig        //sentry配置
 	SkyWalking    *SkyWalkingConfig    //skywalking配置
 	SMS           *SMSConfig           //消息配置
-	MQTT		  *MQTTConfig		   //mqtt配置
+	MQTT          *MQTTConfig          //mqtt配置
 }
 
 type ScheduleTimeConfig struct {
@@ -95,9 +95,12 @@ type OSSPolicyConfig struct {
 	ProjectResource OSSPolicyInfo
 	CompatTest      OSSPolicyInfo
 	UserAvatar      OSSPolicyInfo
+	Feedback        OSSPolicyInfo
 }
 
 type OSSPolicyInfo struct {
+	//容器
+	BucketName string
 	//有效期
 	Expire int64
 	//目录
@@ -112,10 +115,10 @@ type OSSPolicyInfo struct {
 type MailConfig struct {
 	//别名
 	Alias string
-	Usr  string
-	Pwd  string
-	Host string
-	Port int
+	Usr   string
+	Pwd   string
+	Host  string
+	Port  int
 }
 
 type ServerConfig struct {
@@ -145,7 +148,7 @@ type FeiShuSdkConfig struct {
 	AppSecret        string
 	EventEncryptKey  string
 	EventVerifyToken string
-	CardJumpLink CardJumpLink
+	CardJumpLink     CardJumpLink
 }
 
 //飞书卡片跳转链接
@@ -324,6 +327,10 @@ func GetCompatTestPolicyConfig() OSSPolicyInfo {
 
 func GetUserAvatarPolicyConfig() OSSPolicyInfo {
 	return conf.OSS.Policies.UserAvatar
+}
+
+func GetFeedbackPolicyConfig() OSSPolicyInfo {
+	return conf.OSS.Policies.Feedback
 }
 
 func GetSentryConfig() *SentryConfig {
