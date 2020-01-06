@@ -110,6 +110,28 @@ func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
 	}
 	return resultList, nil
 }
+func (rp *Proxy) MSet(kvs map[string]string) error{
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return e
+	}
+	args := make([]interface{}, 0)
+	for k, v := range kvs{
+		args = append(args, k, v)
+	}
+
+	rs, err := conn.Do("MSET", args...)
+	if err != nil {
+		return err
+	}
+	if rs == nil {
+		return err
+	}
+
+	return  nil
+}
+
 
 func (rp *Proxy) Del(keys ...interface{}) (int64, error) {
 	conn, e := Connect()

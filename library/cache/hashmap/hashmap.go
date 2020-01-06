@@ -84,6 +84,13 @@ func (c *CacheMap) MGet(keys ...interface{}) ([]string, error) {
 	return resultList, nil
 }
 
+func (c *CacheMap) MSet(kvs map[string]string) error{
+	for k, v := range kvs {
+		c.Cache.Store(k, v)
+	}
+	return nil
+}
+
 func (c *CacheMap) TryGetDistributedLock(key string, v string) (bool, error) {
 	lock.Lock(key)
 	return true, nil

@@ -17,6 +17,7 @@ type Cache interface {
 	Expire(key string, expire int64) (bool, error)
 	Incrby(key string, v int64) (int64, error)
 	MGet(keys ...interface{}) ([]string, error)
+	MSet(kvs map[string]string) error
 	HGet(key, field string) (string, error)
 	HSet(key, field, value string) error
 	HDel(key string, fields ...interface{}) (int64, error)
@@ -50,6 +51,10 @@ func Get(key string) (string, error) {
 
 func Set(key string, value string) error {
 	return getCache().Set(key, value)
+}
+
+func MSet(kvs map[string]string) error{
+	return getCache().MSet(kvs)
 }
 
 func SetEx(key string, value string, second int64) error {
