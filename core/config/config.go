@@ -261,6 +261,8 @@ type MQTTConfig struct {
 	SecretKey string
 	//channel
 	Channel string
+	//连接数
+	ConnectPoolSize int
 	//是否开启
 	Enable bool
 }

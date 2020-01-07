@@ -2,30 +2,33 @@ package emt
 
 import (
 	"errors"
+	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
 	"gitea.bjx.cloud/allstar/common/core/logger"
 	"gitea.bjx.cloud/allstar/common/core/util/json"
 	emitter "github.com/emitter-io/go/v2"
 	"sync"
+	"time"
 )
 
 var (
-	mqttClient *emitter.Client
 	mqttMutex sync.Mutex
 	log = logger.GetDefaultLogger()
 	disConnectErr = errors.New("mqtt disconnected!")
+	clients []*emitter.Client = nil
 	)
 
 func GetClient() (*emitter.Client, error){
-	client, err := Connect(nil)
+	client, selector, err := Connect(nil)
 	if err != nil{
 		log.Error(err)
 		return nil, err
 	}
+	fmt.Printf("selector %d\n", selector)
 	//断开连接，重试一次
 	if ! client.IsConnected(){
-		mqttClient = nil
-		client, err = Connect(nil)
+		clients[selector] = nil
+		client, _, err = Connect(nil)
 		if err != nil{
 			log.Error(err)
 			return nil, err
@@ -37,11 +40,18 @@ func GetClient() (*emitter.Client, error){
 	return client, nil
 }
 
-func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, error){
-	if mqttClient == nil {
+func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, int, error){
+	initPool()
+
+	selector := int(time.Now().Unix() & int64(len(clients) - 1))
+	selectClient := clients[selector]
+
+	if selectClient == nil {
 		mqttMutex.Lock()
 		defer mqttMutex.Unlock()
-		if mqttClient == nil {
+
+		selectClient = clients[selector]
+		if selectClient == nil {
 			mqttConfig := config.GetMQTTConfig()
 			if mqttConfig == nil{
 				panic("missing mqtt config.")
@@ -51,16 +61,51 @@ func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (
 
 			if mqttConfig.Enable{
 				var err error
-				mqttClient, err = emitter.Connect(mqttConfig.Host, handler, options...)
+				clients[selector], err = emitter.Connect(mqttConfig.Host, handler, options...)
 				if err != nil{
 					log.Error(err)
-					return nil, err
+					return nil, selector, err
 				}
 			}
 		}
 
 	}
-	return mqttClient, nil
+	return clients[selector], selector, nil
+}
+
+func initPool(){
+	mqttConfig := config.GetMQTTConfig()
+	if mqttConfig == nil{
+		panic("missing mqtt config.")
+	}
+
+	if clients == nil{
+		mqttMutex.Lock()
+		defer mqttMutex.Unlock()
+		if clients == nil{
+			poolSize := mqttConfig.ConnectPoolSize
+			if poolSize <= 0{
+				poolSize = 10
+			}
+			clients = make([]*emitter.Client, poolSize)
+		}
+	}
+}
+
+func GetNativeConnect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, error){
+	mqttConfig := config.GetMQTTConfig()
+	if mqttConfig == nil{
+		return nil, errors.New("missing mqtt config.")
+	}
+
+	log.Infof("mqtt config %s", json.ToJsonIgnoreError(mqttConfig))
+
+	mc, err := emitter.Connect(mqttConfig.Host, handler, options...)
+	if err != nil{
+		log.Error(err)
+		return nil, err
+	}
+	return mc, nil
 }
 
 func GenerateKey(channel string, permissions string, ttl int) (string, error){
