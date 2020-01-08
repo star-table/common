@@ -24,6 +24,10 @@ func GetClient() (*emitter.Client, error){
 		log.Error(err)
 		return nil, err
 	}
+	if client == nil{
+		return nil, disConnectErr
+	}
+	
 	fmt.Printf("selector %d\n", selector)
 	//断开连接，重试一次
 	if ! client.IsConnected(){
