@@ -2,11 +2,12 @@ package emt
 
 import (
 	"errors"
-	"fmt"
 	"gitea.bjx.cloud/allstar/common/core/config"
+	"gitea.bjx.cloud/allstar/common/core/lock"
 	"gitea.bjx.cloud/allstar/common/core/logger"
 	"gitea.bjx.cloud/allstar/common/core/util/json"
 	emitter "github.com/emitter-io/go/v2"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -27,18 +28,27 @@ func GetClient() (*emitter.Client, error){
 	if client == nil{
 		return nil, disConnectErr
 	}
-	
-	fmt.Printf("selector %d\n", selector)
+
+	//fmt.Printf("selector %d\n", selector)
+
 	//断开连接，重试一次
 	if ! client.IsConnected(){
-		clients[selector] = nil
-		client, _, err = Connect(nil)
-		if err != nil{
-			log.Error(err)
-			return nil, err
-		}
-		if ! client.IsConnected(){
-			return nil, disConnectErr
+		log.Infof("连接断开，开始重连...")
+
+		key := strconv.Itoa(selector)
+		lock.Lock(key)
+		defer lock.Unlock(key)
+		client = clients[selector]
+		if client == nil || ! client.IsConnected(){
+			clients[selector] = nil
+			client, _, err = Connect(nil)
+			if err != nil{
+				log.Error(err)
+				return nil, err
+			}
+			if ! client.IsConnected(){
+				return nil, disConnectErr
+			}
 		}
 	}
 	return client, nil
@@ -130,4 +140,16 @@ func GenerateKey(channel string, permissions string, ttl int) (string, error){
 		return "", err
 	}
 	return key, nil
+}
+
+func Publish(key, channel string, payload interface{}, handler emitter.ErrorHandler) error{
+	client, err := GetClient()
+	if err != nil{
+		log.Error(err)
+		return err
+	}
+	if handler != nil{
+		client.OnError(handler)
+	}
+	return client.Publish(key, channel, payload, emitter.WithAtLeastOnce())
 }

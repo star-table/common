@@ -17,7 +17,24 @@ func TestConnect(t *testing.T) {
 
 	client, err := GetClient()
 	assert.Equal(t, err, nil)
-	assert.Equal(t, client.IsConnected(), true)
+	if err == nil{
+		assert.Equal(t, client.IsConnected(), true)
+	}
+
+	for ;;{
+		time.Sleep(1 * time.Second)
+
+		client, err = GetClient()
+		if err != nil{
+			fmt.Println("err: ", err)
+			continue
+		}
+		fmt.Println("is connected", client.IsConnected())
+	}
+
+	select {
+
+	}
 
 }
 
