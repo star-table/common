@@ -54,28 +54,23 @@ func getKafkaConfig() *config.KafkaMQConfig {
 	return config.GetKafkaConfig()
 }
 
-func (proxy *Proxy) getProducerAutoConnect(topic string, partition int32) (*sarama.AsyncProducer, errors.SystemErrorInfo) {
+func (proxy *Proxy) getProducerAutoConnect(topic string) (*sarama.AsyncProducer, errors.SystemErrorInfo) {
 	//key := topic + "#" + strconv.Itoa(int(partition))
-	producer, err := proxy.getProducer(topic, partition)
+	producer, err := proxy.getProducer(topic)
 	if err != nil {
 		log.Error(strs.ObjectToString(err))
 		return nil, err
 	}
-	p := *producer
-
-	p.Errors()
-
-	//TODO(nico) 这里做一下断开重连的逻辑
 	return producer, nil
 }
 
-func (proxy *Proxy) getProducer(topic string, partition int32) (*sarama.AsyncProducer, errors.SystemErrorInfo) {
-	key := topic + "#" + strconv.Itoa(int(partition))
+func (proxy *Proxy) getProducer(topic string) (*sarama.AsyncProducer, errors.SystemErrorInfo) {
+	key := topic
 	if proxy.producers == nil {
 		proxy.producers = map[string]sarama.AsyncProducer{}
 	}
 
-	if v, ok := proxy.producers[key]; ok {
+	if v, ok := proxy.producers[key]; ok && v != nil{
 		return &v, nil
 	}
 
@@ -87,11 +82,15 @@ func (proxy *Proxy) getProducer(topic string, partition int32) (*sarama.AsyncPro
 	}
 	if suc {
 		//如果获取到锁，则开始初始化
-		defer cache.ReleaseDistributedLock(key, uuid)
+		defer func() {
+			if _, err := cache.ReleaseDistributedLock(key, uuid); err != nil{
+				log.Error(err)
+			}
+		}()
 	}
 
 	//二次确认
-	if v, ok := proxy.producers[key]; ok {
+	if v, ok := proxy.producers[key]; ok && v != nil{
 		return &v, nil
 	}
 
@@ -104,6 +103,11 @@ func (proxy *Proxy) getProducer(topic string, partition int32) (*sarama.AsyncPro
 
 	proxy.producers[key] = *producer
 	return producer, nil
+}
+
+func (proxy *Proxy) CloseConnect(topic string) errors.SystemErrorInfo{
+	proxy.producers[topic] = nil
+	return nil
 }
 
 func (proxy *Proxy) buildProducer() (*sarama.AsyncProducer, errors.SystemErrorInfo) {
@@ -149,15 +153,17 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 				},
 			},
 		}
-		p, err1 := proxy.getProducerAutoConnect(message.Topic, message.Partition)
-		if err1 != nil {
-			log.Error(strs.ObjectToString(err1))
-			return nil, err1
-		}
-		producer := *p
+
 
 		var pushErr error = nil
-		for rePushTime := int(0); rePushTime <= RePushTimes; rePushTime++ {
+		for rePushTime := 0; rePushTime <= RePushTimes; rePushTime++ {
+			p, err1 := proxy.getProducerAutoConnect(message.Topic)
+			if err1 != nil {
+				log.Error(strs.ObjectToString(err1))
+				return nil, err1
+			}
+			producer := *p
+
 			if rePushTime > 0 {
 				log.Infof("重试次数%d，最大次数%d, 上次失败原因%v, 消息内容%s", rePushTime, message.RePushTimes, pushErr, json.ToJsonIgnoreError(message))
 			}
@@ -168,9 +174,18 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 				pushErr = nil
 			case fail := <-producer.Errors():
 				log.Errorf("err: %s\n", fail.Err.Error())
-				pushErr = fail
+				pushErr = fail.Err
 				//return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, fail)
-				time.Sleep(time.Duration(5) * time.Second)
+
+				if pushErr == sarama.ErrNotConnected || pushErr == sarama.ErrClosedClient || pushErr == sarama.ErrOutOfBrokers{
+					log.Errorf("断开连接... %v", pushErr)
+					//重连
+					closeErr := proxy.CloseConnect(message.Topic)
+					if closeErr != nil{
+						log.Error(closeErr)
+					}
+				}
+				time.Sleep(time.Duration(3) * time.Second)
 			}
 			if pushErr == nil {
 				break

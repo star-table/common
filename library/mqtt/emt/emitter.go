@@ -80,6 +80,8 @@ func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (
 					log.Error(err)
 					return nil, selector, err
 				}
+			}else{
+				log.Error("mqtt已被禁用")
 			}
 		}
 

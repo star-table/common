@@ -8,6 +8,7 @@ import (
 	"github.com/Shopify/sarama"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type exampleConsumerGroupHandler struct {
@@ -31,7 +32,7 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 	case msg := <-claim.Messages():
 		if msg != nil {
 			//获取重试次数
-			ReconsumeTimes := int(0)
+			ReconsumeTimes := 0
 			if msg.Headers != nil{
 				for _, header := range msg.Headers{
 					if string(header.Key) == RecordHeaderReconsumeTimes{
@@ -81,6 +82,7 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 
 func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message *model.MqMessageExt) errors.SystemErrorInfo, errCallback func(message *model.MqMessageExt)) errors.SystemErrorInfo {
 	kafkaConfig := getKafkaConfig()
+	log.Infof("Kafka config %s", json.ToJsonIgnoreError(kafkaConfig))
 	log.Infof("Starting a new Sarama consumer, topic %s, groupId %s", topic, groupId)
 
 	config := sarama.NewConfig()
@@ -89,27 +91,44 @@ func (proxy *Proxy) ConsumeMessage(topic string, groupId string, fu func(message
 	config.Version = version
 
 	topics := []string{topic}
-	ctx, _ := context.WithCancel(context.Background())
-	client, err := sarama.NewConsumerGroup(strings.Split(kafkaConfig.NameServers, ","), groupId, config)
-	if err != nil {
-		log.Errorf("Error creating consumer group client: %v", err)
-		return errors.BuildSystemErrorInfo(errors.KafkaMqConsumeStartError)
-	}
 
-	handler := exampleConsumerGroupHandler{
-		fu: fu,
-		proxy: proxy,
-		errCallback: errCallback,
-	}
-	for {
-		//log.Infof("准备消费, topic %s, groupId %s", topic, groupId)
-		if err := client.Consume(ctx, topics, &handler); err != nil {
-			log.Errorf("Error from consumer: %v", err)
+
+
+	for{
+
+		log.Info("开始连接...")
+
+		ctx, _ := context.WithCancel(context.Background())
+		client, err := sarama.NewConsumerGroup(strings.Split(kafkaConfig.NameServers, ","), groupId, config)
+		if err != nil {
+			log.Errorf("Error creating consumer group client: %v", err)
+			return errors.BuildSystemErrorInfo(errors.KafkaMqConsumeStartError)
 		}
-		// check if context was cancelled, signaling that the consumer should stop
-		if ctx.Err() != nil {
-			log.Errorf("异常退出 %v", ctx.Err())
+
+		handler := exampleConsumerGroupHandler{
+			fu: fu,
+			proxy: proxy,
+			errCallback: errCallback,
 		}
+
+		for {
+			//log.Infof("准备消费, topic %s, groupId %s", topic, groupId)
+			if err := client.Consume(ctx, topics, &handler); err != nil {
+				log.Errorf("Error from consumer: %v", err)
+			}
+			// check if context was cancelled, signaling that the consumer should stop
+			if ctx.Err() != nil {
+				log.Errorf("异常退出 %v", ctx.Err())
+				break
+			}
+		}
+
+		err = client.Close()
+		if err != nil{
+			log.Errorf("关闭连接失败 %v", err)
+		}
+		time.Sleep(2 * time.Second)
+		log.Info("准备重连...")
 	}
 
 	log.Info("消费结束")

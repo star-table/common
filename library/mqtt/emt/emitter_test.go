@@ -32,10 +32,6 @@ func TestConnect(t *testing.T) {
 		fmt.Println("is connected", client.IsConnected())
 	}
 
-	select {
-
-	}
-
 }
 
 func TestGenerateKey(t *testing.T) {
