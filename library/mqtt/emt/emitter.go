@@ -75,7 +75,7 @@ func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (
 
 			if mqttConfig.Enable{
 				var err error
-				clients[selector], err = emitter.Connect(mqttConfig.Host, handler, options...)
+				clients[selector], err = emitter.Connect(mqttConfig.Address, handler, options...)
 				if err != nil{
 					log.Error(err)
 					return nil, selector, err
@@ -116,7 +116,7 @@ func GetNativeConnect(handler emitter.MessageHandler, options ...func(*emitter.C
 
 	log.Infof("mqtt config %s", json.ToJsonIgnoreError(mqttConfig))
 
-	mc, err := emitter.Connect(mqttConfig.Host, handler, options...)
+	mc, err := emitter.Connect(mqttConfig.Address, handler, options...)
 	if err != nil{
 		log.Error(err)
 		return nil, err

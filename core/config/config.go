@@ -255,8 +255,12 @@ type SMSConfig struct {
 }
 
 type MQTTConfig struct {
-	//host
+	//地址
+	Address string
+	//Host
 	Host string
+	//Port
+	Port int
 	//key
 	SecretKey string
 	//channel
