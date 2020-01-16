@@ -216,6 +216,12 @@ type TopicConfig struct {
 	OrgMemberChange TopicConfigInfo
 	//飞书回调消费
 	FeiShuCallBack TopicConfigInfo
+	//飞书任务日报推送
+	DailyTaskPushToFeishu TopicConfigInfo
+	//迭代燃尽图
+	StatisticIterationBurnDownChart TopicConfigInfo
+	//项目燃尽图
+	StatisticProjectIssueBurnDownChart TopicConfigInfo
 }
 
 type TopicConfigInfo struct {
@@ -281,6 +287,18 @@ func GetScheduleTime() *ScheduleTimeConfig {
 
 func GetMQTTConfig() *MQTTConfig {
 	return conf.MQTT
+}
+
+func GetDailyTaskPushToFeishu() TopicConfigInfo {
+	return conf.Mq.Topics.DailyTaskPushToFeishu
+}
+
+func GetStatisticIterationBurnDownChart() TopicConfigInfo {
+	return conf.Mq.Topics.StatisticIterationBurnDownChart
+}
+
+func GetStatisticProjectIssueBurnDownChart() TopicConfigInfo {
+	return conf.Mq.Topics.StatisticProjectIssueBurnDownChart
 }
 
 func GetMqDailyProjectReportProjectTopicConfig() TopicConfigInfo {
