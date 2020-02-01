@@ -1,7 +1,7 @@
 package json
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/consts"
+	"github.com/galaxy-book/common/core/consts"
 	jsoniter "github.com/json-iterator/go"
 	"time"
 	"unsafe"

@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/util/json"
 	"testing"
 )
 

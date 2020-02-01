@@ -1,10 +1,10 @@
 package cache
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/library/cache/hashmap"
-	"gitea.bjx.cloud/allstar/common/library/cache/redis"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/library/cache/hashmap"
+	"github.com/galaxy-book/common/library/cache/redis"
 	"sync"
 )
 

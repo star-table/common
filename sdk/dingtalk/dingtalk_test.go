@@ -1,7 +1,7 @@
 package dingtalk
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	"testing"
 )
 

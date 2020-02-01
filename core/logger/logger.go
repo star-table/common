@@ -2,11 +2,11 @@ package logger
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/model"
-	"gitea.bjx.cloud/allstar/common/core/threadlocal"
-	"gitea.bjx.cloud/allstar/common/core/util/strs"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/model"
+	"github.com/galaxy-book/common/core/threadlocal"
+	"github.com/galaxy-book/common/core/util/strs"
 	"github.com/Shopify/sarama"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

@@ -2,9 +2,9 @@ package date
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/types"
-	"gitea.bjx.cloud/allstar/common/core/util/tests"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/types"
+	"github.com/galaxy-book/common/core/util/tests"
 	"testing"
 	"time"
 

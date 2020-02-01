@@ -3,8 +3,8 @@ package encrypt
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"gitea.bjx.cloud/allstar/common/core/logger"
-	"gitea.bjx.cloud/allstar/common/core/util/strs"
+	"github.com/galaxy-book/common/core/logger"
+	"github.com/galaxy-book/common/core/util/strs"
 )
 
 var key = "&polaris*aes#key"

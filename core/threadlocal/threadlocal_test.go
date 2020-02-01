@@ -1,8 +1,8 @@
 package threadlocal
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/util/uuid"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/util/uuid"
 	"github.com/jtolds/gls"
 	"testing"
 )

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/util/file"
-	json2 "gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/util/file"
+	json2 "github.com/galaxy-book/common/core/util/json"
 	"github.com/smartystreets/goconvey/convey"
 	"testing"
 )

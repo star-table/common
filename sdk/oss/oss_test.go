@@ -3,7 +3,7 @@ package oss
 import (
 	"bufio"
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	"os"
 	"testing"
 )

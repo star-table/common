@@ -2,9 +2,9 @@ package types
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/util/copyer"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/util/copyer"
+	"github.com/galaxy-book/common/core/util/json"
 	"testing"
 	"time"
 )

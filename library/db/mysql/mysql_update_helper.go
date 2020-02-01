@@ -1,9 +1,9 @@
 package mysql
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/logger"
-	"gitea.bjx.cloud/allstar/common/core/util/strs"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/logger"
+	"github.com/galaxy-book/common/core/util/strs"
 	"upper.io/db.v3"
 	"upper.io/db.v3/lib/sqlbuilder"
 )

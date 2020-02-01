@@ -2,7 +2,7 @@ package es
 
 import (
 	"errors"
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	"github.com/olivere/elastic/v7"
 	"net/http"
 	"sync"

@@ -2,9 +2,9 @@ package dbmq
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/core/model"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/errors"
+	"github.com/galaxy-book/common/core/model"
 	"strconv"
 	"testing"
 	"time"

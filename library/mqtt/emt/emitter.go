@@ -2,10 +2,10 @@ package emt
 
 import (
 	"errors"
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/lock"
-	"gitea.bjx.cloud/allstar/common/core/logger"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/lock"
+	"github.com/galaxy-book/common/core/logger"
+	"github.com/galaxy-book/common/core/util/json"
 	emitter "github.com/emitter-io/go/v2"
 	"strconv"
 	"sync"

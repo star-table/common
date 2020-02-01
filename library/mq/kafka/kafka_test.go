@@ -2,10 +2,10 @@ package kafka
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/core/model"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/errors"
+	"github.com/galaxy-book/common/core/model"
+	"github.com/galaxy-book/common/core/util/json"
 	"strconv"
 	"testing"
 	"time"

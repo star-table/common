@@ -1,8 +1,8 @@
 package oss
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/consts"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/consts"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"io"
 )

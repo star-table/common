@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/util/times"
+	"github.com/galaxy-book/common/core/util/times"
 	"math/rand"
 	"reflect"
 	"sync"

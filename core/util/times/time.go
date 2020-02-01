@@ -1,9 +1,9 @@
 package times
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/types"
-	"gitea.bjx.cloud/allstar/common/core/util/date"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/types"
+	"github.com/galaxy-book/common/core/util/date"
 	"time"
 )
 

@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	"testing"
 	"upper.io/db.v3/lib/sqlbuilder"
 )

@@ -1,9 +1,9 @@
 package copyer
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/logger"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
-	"gitea.bjx.cloud/allstar/common/core/util/strs"
+	"github.com/galaxy-book/common/core/logger"
+	"github.com/galaxy-book/common/core/util/json"
+	"github.com/galaxy-book/common/core/util/strs"
 	"github.com/pkg/errors"
 )
 

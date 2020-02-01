@@ -3,7 +3,7 @@ package mysql
 import (
 	"errors"
 	"github.com/polaris-team/converter"
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	"runtime"
 	"strconv"
 	"strings"

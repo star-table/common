@@ -1,14 +1,14 @@
 package dbmq
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/core/logger"
-	"gitea.bjx.cloud/allstar/common/core/model"
-	"gitea.bjx.cloud/allstar/common/core/util/id/snowflake"
-	"gitea.bjx.cloud/allstar/common/core/util/strs"
-	"gitea.bjx.cloud/allstar/common/core/util/times"
-	"gitea.bjx.cloud/allstar/common/library/db/mysql"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/errors"
+	"github.com/galaxy-book/common/core/logger"
+	"github.com/galaxy-book/common/core/model"
+	"github.com/galaxy-book/common/core/util/id/snowflake"
+	"github.com/galaxy-book/common/core/util/strs"
+	"github.com/galaxy-book/common/core/util/times"
+	"github.com/galaxy-book/common/library/db/mysql"
 	"strconv"
 	"sync"
 	"time"

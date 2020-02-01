@@ -1,8 +1,8 @@
 package random
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/util/times"
-	"gitea.bjx.cloud/allstar/common/core/util/uuid"
+	"github.com/galaxy-book/common/core/util/times"
+	"github.com/galaxy-book/common/core/util/uuid"
 	"math/rand"
 	"strconv"
 	"time"

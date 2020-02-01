@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/consts"
+	"github.com/galaxy-book/common/core/consts"
 	"io"
 	"strings"
 	"time"

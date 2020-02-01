@@ -1,12 +1,12 @@
 package mq
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/config"
-	"gitea.bjx.cloud/allstar/common/core/consts"
-	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/core/model"
-	"gitea.bjx.cloud/allstar/common/library/mq/dbmq"
-	"gitea.bjx.cloud/allstar/common/library/mq/kafka"
+	"github.com/galaxy-book/common/core/config"
+	"github.com/galaxy-book/common/core/consts"
+	"github.com/galaxy-book/common/core/errors"
+	"github.com/galaxy-book/common/core/model"
+	"github.com/galaxy-book/common/library/mq/dbmq"
+	"github.com/galaxy-book/common/library/mq/kafka"
 )
 
 type MQClient interface {

@@ -2,7 +2,7 @@ package emt
 
 import (
 	"fmt"
-	"gitea.bjx.cloud/allstar/common/core/config"
+	"github.com/galaxy-book/common/core/config"
 	emitter "github.com/emitter-io/go/v2"
 	"github.com/stretchr/testify/assert"
 	"strconv"

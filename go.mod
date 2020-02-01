@@ -1,4 +1,4 @@
-module gitea.bjx.cloud/allstar/common
+module github.com/galaxy-book/common
 
 go 1.13
 

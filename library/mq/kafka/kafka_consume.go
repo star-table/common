@@ -2,9 +2,9 @@ package kafka
 
 import (
 	"context"
-	"gitea.bjx.cloud/allstar/common/core/errors"
-	"gitea.bjx.cloud/allstar/common/core/model"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
+	"github.com/galaxy-book/common/core/errors"
+	"github.com/galaxy-book/common/core/model"
+	"github.com/galaxy-book/common/core/util/json"
 	"github.com/Shopify/sarama"
 	"strconv"
 	"strings"

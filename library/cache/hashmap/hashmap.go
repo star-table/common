@@ -1,9 +1,9 @@
 package hashmap
 
 import (
-	"gitea.bjx.cloud/allstar/common/core/lock"
-	"gitea.bjx.cloud/allstar/common/core/util/json"
-	"gitea.bjx.cloud/allstar/common/core/util/slice"
+	"github.com/galaxy-book/common/core/lock"
+	"github.com/galaxy-book/common/core/util/json"
+	"github.com/galaxy-book/common/core/util/slice"
 	"strconv"
 	"sync"
 )
