@@ -1,9 +1,9 @@
 package oss
 
 import (
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/star-table/common/core/config"
 	"github.com/star-table/common/core/consts"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"io"
 )
 

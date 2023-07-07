@@ -6,11 +6,11 @@ import (
 	"math/rand"
 	"reflect"
 
-	"github.com/opentracing/opentracing-go"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/threadlocal"
 	"github.com/star-table/common/core/util/times"
 	"github.com/star-table/common/library/tracing"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/gomodule/redigo/redis"
 )

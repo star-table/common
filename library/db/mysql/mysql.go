@@ -8,13 +8,13 @@ import (
 
 	upperPg "upper.io/db.v3/postgresql"
 
-	"github.com/go-sql-driver/mysql"
-	"github.com/opentracing/opentracing-go"
-	"github.com/qustavo/sqlhooks/v2"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/threadlocal"
 	"github.com/star-table/common/core/util/strs"
 	"github.com/star-table/common/library/tracing"
+	"github.com/go-sql-driver/mysql"
+	"github.com/opentracing/opentracing-go"
+	"github.com/qustavo/sqlhooks/v2"
 
 	"errors"
 	"strconv"

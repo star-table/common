@@ -1,10 +1,10 @@
 package threadlocal
 
 import (
-	"github.com/jtolds/gls"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/model"
 	"github.com/star-table/common/core/util/uuid"
+	"github.com/jtolds/gls"
 )
 
 var (
@@ -36,7 +36,8 @@ func SetTraceId() {
 	Mgr.SetValues(gls.Values{consts.TraceIdKey: uuid.NewUuid()}, func() {})
 }
 
-func GetValue(key string) string {
+
+func GetValue(key string) string{
 	if traceId, ok := Mgr.GetValue(key); ok {
 		if traceId != nil {
 			return traceId.(string)

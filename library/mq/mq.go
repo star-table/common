@@ -15,8 +15,8 @@ type MQClient interface {
 }
 
 var (
-	kafkaClient MQClient = &kafka.Proxy{}
-	dbMqClient  MQClient = &dbmq.DbMQProxy{}
+	kafkaClient	   MQClient = &kafka.Proxy{}
+	dbMqClient		MQClient = &dbmq.DbMQProxy{}
 )
 
 func GetMQClient() *MQClient {

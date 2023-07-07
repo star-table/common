@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/star-table/common/core/config"
+	"github.com/gomodule/redigo/redis"
 
 	"strconv"
 )
@@ -45,7 +45,7 @@ func initRedisPool() {
 
 	if rc.IsSentinel {
 		sntnl := &Sentinel{
-			Addrs:      []string{rc.Host + ":" + strconv.Itoa(rc.Port)},
+			Addrs:      []string{rc.Host+":"+strconv.Itoa(rc.Port)},
 			MasterName: rc.MasterName,
 			Dial: func(addr string) (redis.Conn, error) {
 				c, err := redis.Dial("tcp", addr,

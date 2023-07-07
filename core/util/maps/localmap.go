@@ -7,7 +7,7 @@ import (
 
 type LocalMap map[interface{}]interface{}
 
-func NewMap(key string, source interface{}) LocalMap {
+func NewMap(key string, source interface{}) LocalMap{
 	list := slice.ToSlice(source)
 	localMap := LocalMap{}
 	for _, obj := range list {

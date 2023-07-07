@@ -1,9 +1,9 @@
 package threadlocal
 
 import (
-	"github.com/jtolds/gls"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/util/uuid"
+	"github.com/jtolds/gls"
 	"testing"
 )
 

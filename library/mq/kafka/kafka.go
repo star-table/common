@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/star-table/common/core/config"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/errors"
@@ -15,6 +14,7 @@ import (
 	"github.com/star-table/common/core/util/strs"
 	"github.com/star-table/common/core/util/uuid"
 	"github.com/star-table/common/library/cache"
+	"github.com/Shopify/sarama"
 	"go.uber.org/zap"
 )
 

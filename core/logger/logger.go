@@ -2,14 +2,14 @@ package logger
 
 import (
 	"fmt"
-	"github.com/Shopify/sarama"
-	"github.com/getsentry/sentry-go"
 	"github.com/star-table/common/core/config"
 	"github.com/star-table/common/core/consts"
 	"github.com/star-table/common/core/model"
 	"github.com/star-table/common/core/threadlocal"
 	"github.com/star-table/common/core/util/sentry/client"
 	"github.com/star-table/common/core/util/strs"
+	"github.com/Shopify/sarama"
+	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

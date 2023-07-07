@@ -50,10 +50,12 @@ func TestSelectByQuery(t *testing.T) {
 	fmt.Println(len(*s))
 	fmt.Println(json.ToJsonIgnoreError(s))
 
+
 	err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 2", s)
 	fmt.Println(err)
 	fmt.Println(len(*s))
 	fmt.Println(json.ToJsonIgnoreError(s))
+
 
 	err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 3", s)
 	fmt.Println(err)

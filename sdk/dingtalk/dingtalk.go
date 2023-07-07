@@ -1,9 +1,9 @@
 package dingtalk
 
 import (
+	"github.com/star-table/common/core/config"
 	"github.com/pkg/errors"
 	"github.com/polaris-team/dingtalk-sdk-golang/sdk"
-	"github.com/star-table/common/core/config"
 	"os"
 	"strconv"
 	"sync"

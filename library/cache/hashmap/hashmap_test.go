@@ -1,8 +1,8 @@
 package hashmap
 
 import (
-	"github.com/magiconair/properties/assert"
 	"github.com/star-table/common/core/util/json"
+	"github.com/magiconair/properties/assert"
 	"strconv"
 	"testing"
 )

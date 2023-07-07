@@ -1,10 +1,10 @@
 package copyer
 
 import (
-	"github.com/pkg/errors"
 	"github.com/star-table/common/core/logger"
 	"github.com/star-table/common/core/util/json"
 	"github.com/star-table/common/core/util/strs"
+	"github.com/pkg/errors"
 )
 
 var log = logger.GetDefaultLogger()

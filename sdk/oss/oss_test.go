@@ -32,7 +32,7 @@ func TestSignUrlWithStream(t *testing.T) {
 func TestGetObjectUrl(t *testing.T) {
 
 	config.LoadUnitTestConfig()
-	signUrl, err := GetObjectUrl("org_1325/project_1525/issue_7127/resource/2019/12/12/91d6d6461c6e4176a77aa486dde75f651576153986043.xlsx", 6000)
+	signUrl, err := GetObjectUrl("org_1325/project_1525/issue_7127/resource/2019/12/12/91d6d6461c6e4176a77aa486dde75f651576153986043.xlsx",  6000)
 	t.Log(err)
 	t.Log(signUrl)
 }

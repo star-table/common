@@ -2,8 +2,8 @@ package es
 
 import (
 	"errors"
-	"github.com/olivere/elastic/v7"
 	"github.com/star-table/common/core/config"
+	"github.com/olivere/elastic/v7"
 	"net/http"
 	"sync"
 	"time"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/smartystreets/goconvey/convey"
 	"github.com/star-table/common/core/util/file"
 	json2 "github.com/star-table/common/core/util/json"
+	"github.com/smartystreets/goconvey/convey"
 )
 
 /**

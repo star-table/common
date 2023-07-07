@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/star-table/common/core/errors"
 	"github.com/star-table/common/core/model"
 	"github.com/star-table/common/core/util/json"
+	"github.com/Shopify/sarama"
 )
 
 type exampleConsumerGroupHandler struct {

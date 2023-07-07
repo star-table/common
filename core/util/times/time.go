@@ -67,7 +67,7 @@ func GetTodayTimeQuantum() []time.Time {
 }
 
 //2019-09-03
-func GetYesterdayDate() string {
+func GetYesterdayDate() string{
 	timeStr := time.Now().Format(consts.AppDateFormat)
 	b, _ := time.Parse(consts.AppDateFormat, timeStr)
 	a := b.Add(time.Duration(-1) * time.Millisecond)
