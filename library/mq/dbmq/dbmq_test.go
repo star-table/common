@@ -2,9 +2,9 @@ package dbmq
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/model"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/model"
 	"strconv"
 	"testing"
 	"time"
@@ -24,7 +24,7 @@ func TestGetDbMQProxy(t *testing.T) {
 
 	config.LoadUnitTestConfig()
 
-	for i := 0; i < 10 ; i++ {
+	for i := 0; i < 10; i++ {
 
 		msg := &model.MqMessage{
 

@@ -1,17 +1,65 @@
 package mysql
 
 import (
-	"github.com/galaxy-book/common/core/config"
+	"fmt"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/util/json"
 	"testing"
+	"time"
 )
 
 func TestSelectByQuery(t *testing.T) {
 	config.LoadUnitTestConfig()
 
 	//s := &[]domains.PpmProProjectRelation{}
-	s := &[]int64{}
-	err := SelectByQuery("SELECT id FROM ppm_pro_project_relation WHERE relation_id = 1007 AND is_delete = 2", s)
-	t.Log(err)
-	t.Log(len(*s))
+
+	//i := true
+	//
+	//for ;;{
+	//	if i{
+	//		s := &[]map[string]interface{}{}
+	//		err := SelectByQuery("SELECT * FROM ppm_pri_issue limit 1", s)
+	//		fmt.Println(err)
+	//		fmt.Println(len(*s))
+	//		fmt.Println(json.ToJsonIgnoreError(s))
+	//
+	//
+	//		err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 2", s)
+	//		fmt.Println(err)
+	//		fmt.Println(len(*s))
+	//		fmt.Println(json.ToJsonIgnoreError(s))
+	//
+	//
+	//		err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 3", s)
+	//		fmt.Println(err)
+	//		fmt.Println(len(*s))
+	//		fmt.Println(json.ToJsonIgnoreError(s))
+	//
+	//		time.Sleep(2 * time.Millisecond)
+	//	}
+	//}
+	//
+	//go func() {
+	//	time.Sleep(60)
+	//	i = false
+	//}()
+
+	s := &[]map[string]interface{}{}
+	err := SelectByQuery("SELECT * FROM ppm_pri_issue limit 1", s)
+	fmt.Println(err)
+	fmt.Println(len(*s))
+	fmt.Println(json.ToJsonIgnoreError(s))
+
+	err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 2", s)
+	fmt.Println(err)
+	fmt.Println(len(*s))
+	fmt.Println(json.ToJsonIgnoreError(s))
+
+	err = SelectByQuery("SELECT * FROM ppm_pri_issue limit 3", s)
+	fmt.Println(err)
+	fmt.Println(len(*s))
+	fmt.Println(json.ToJsonIgnoreError(s))
+
+	time.Sleep(2 * time.Millisecond)
 
 }

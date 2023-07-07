@@ -1,20 +1,12 @@
 package mysql
 
 import (
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/util/strs"
+	"github.com/star-table/common/core/util/strs"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 
 func Insert(obj Domain) error {
 	conn, err := GetConnect()
-	defer func() {
-		if conn != nil {
-			if err := conn.Close(); err != nil {
-				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
-			}
-		}
-	}()
 	if err != nil {
 		return err
 	}
@@ -27,13 +19,6 @@ func Insert(obj Domain) error {
 
 func InsertReturnId(obj Domain) (interface{}, error) {
 	conn, err := GetConnect()
-	defer func() {
-		if conn != nil {
-			if err := conn.Close(); err != nil {
-				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
-			}
-		}
-	}()
 	if err != nil {
 		return nil, err
 	}
@@ -81,13 +66,6 @@ func TransBatchInsert(tx sqlbuilder.Tx, obj Domain, objs []interface{}) error {
 
 func BatchInsert(obj Domain, objs []interface{}) error {
 	conn, err := GetConnect()
-	defer func() {
-		if conn != nil {
-			if err := conn.Close(); err != nil {
-				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
-			}
-		}
-	}()
 	if err != nil {
 		log.Error(strs.ObjectToString(err))
 		return err

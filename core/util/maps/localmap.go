@@ -1,13 +1,13 @@
 package maps
 
 import (
-	"github.com/galaxy-book/common/core/util/slice"
+	"github.com/star-table/common/core/util/slice"
 	"reflect"
 )
 
 type LocalMap map[interface{}]interface{}
 
-func NewMap(key string, source interface{}) LocalMap{
+func NewMap(key string, source interface{}) LocalMap {
 	list := slice.ToSlice(source)
 	localMap := LocalMap{}
 	for _, obj := range list {

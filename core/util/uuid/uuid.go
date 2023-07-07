@@ -6,7 +6,6 @@ import (
 )
 
 func NewUuid() string {
-	id := uuid.NewV4().String()
-
-	return strings.ReplaceAll(id, "-", "")
+	id, _ := uuid.NewV4()
+	return strings.ReplaceAll(id.String(), "-", "")
 }

@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
+	"github.com/star-table/common/core/config"
 	"testing"
 	"upper.io/db.v3/lib/sqlbuilder"
 )

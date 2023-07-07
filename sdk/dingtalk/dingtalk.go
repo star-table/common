@@ -1,9 +1,9 @@
 package dingtalk
 
 import (
-	"github.com/galaxy-book/common/core/config"
 	"github.com/pkg/errors"
 	"github.com/polaris-team/dingtalk-sdk-golang/sdk"
+	"github.com/star-table/common/core/config"
 	"os"
 	"strconv"
 	"sync"
@@ -28,6 +28,8 @@ func initSDK() {
 			os.Setenv("SUITE_SECRET", dtc.SuiteSecret)
 			os.Setenv("SUITE_TOKEN", dtc.Token)
 			os.Setenv("SUITE_AES_KEY", dtc.AesKey)
+			os.Setenv("OAUTH_APP_ID", dtc.OauthAppId)
+			os.Setenv("OAUTH_APP_SECRET", dtc.OauthAppSecret)
 			os.Setenv("APP_ID", strconv.FormatInt(dtc.AppId, 10))
 			dingTalkSDK = sdk.NewSDK()
 		}
@@ -85,4 +87,10 @@ func NewDingTalkClient(accessToken string, agentId int64) *sdk.DingTalkClient {
 	}
 }
 
-
+func NewDingTalkOauthClient() *sdk.DingTalkOauthClient {
+	initSDK()
+	return &sdk.DingTalkOauthClient{
+		OauthAppId:     os.Getenv("OAUTH_APP_ID"),
+		OauthAppSecret: os.Getenv("OAUTH_APP_SECRET"),
+	}
+}

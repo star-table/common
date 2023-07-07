@@ -2,12 +2,14 @@ package logger
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/core/threadlocal"
-	"github.com/galaxy-book/common/core/util/strs"
 	"github.com/Shopify/sarama"
+	"github.com/getsentry/sentry-go"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/core/threadlocal"
+	"github.com/star-table/common/core/util/sentry/client"
+	"github.com/star-table/common/core/util/strs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -16,9 +18,17 @@ import (
 	"sync"
 )
 
+// 日志包的封装
+
+// 常规用法，在一个服务的 main 文件中，调用 `var log = logger.GetDefaultLogger()`
+// 在后续的业务代码中，可以直接调用 common 包下 logger 包的 Error()、 Info() 等方法。
+// 例如：在 xx_service.go 业务代码文件中，声明一个 全局变量 log：`var log = *logger.GetDefaultLogger()`
+// 而后，在对应的方法中调用日志方法：`log.Error(someErr.Error())`
 var (
 	_lock   sync.Mutex
 	_logger = map[string]*SysLogger{}
+	// 额外的日志配置
+	extraLoggerOption = map[string]interface{}{}
 )
 
 var levelMap = map[string]zapcore.Level{
@@ -128,6 +138,16 @@ func (s *SysLogger) ErrorHf(httpContext *model.HttpContext, fmtstr string, args 
 	s.log.Error("[traceId="+traceId+"]"+msg, fie)
 }
 
+func (s *SysLogger) Fatal(msg interface{}, fields ...zap.Field) {
+	s.Init()
+	traceId, fie := getTraceIdFieldByThreadLocal()
+	str, ok := msg.(string)
+	if !ok {
+		str = strs.ObjectToString(msg)
+	}
+	s.log.Fatal("[traceId="+traceId+"]"+str, append(fields, fie)...)
+}
+
 func (s *SysLogger) Debug(msg interface{}, fields ...zap.Field) {
 	s.Init()
 	traceId, fie := getTraceIdFieldByThreadLocal()
@@ -195,6 +215,11 @@ func (s *SysLogger) Init() {
 	}
 }
 
+// 设置额外的配置，并在实例化 logger 时使用。但必须在实例化之前调用 SetExtraLoggerOption
+func (s *SysLogger) SetExtraLoggerOption(key string, value interface{}) {
+	extraLoggerOption[key] = value
+}
+
 func (s *SysLogger) InitLogger() *SysLogger {
 	logConfig := config.GetLogConfig(s.name)
 	if logConfig == nil {
@@ -219,15 +244,47 @@ func (s *SysLogger) InitLogger() *SysLogger {
 		// High-priority output should also go to standard error, and low-priority
 		// output should also go to standard out.
 		consoleOut := zapcore.Lock(os.Stdout)
+		syncWriterList := []zapcore.WriteSyncer{
+			consoleOut, syncWriter,
+		}
 
 		core = zapcore.NewCore(zapcore.NewJSONEncoder(encoder),
-			zapcore.NewMultiWriteSyncer(consoleOut, syncWriter),
+			zapcore.NewMultiWriteSyncer(syncWriterList...),
 			zap.NewAtomicLevelAt(level))
 	}
 
 	// 设置初始化字段
 	filed := zap.Fields(zap.String(consts.LogTagKey, logConfig.Tag), zap.String(consts.LogAppKey, config.GetApplication().Name))
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1), filed)
+	if s, ok := extraLoggerOption["sentryClient"]; ok {
+		sentryClient, ok2 := s.(*sentry.Client)
+		if ok2 {
+			keyword := ""
+			if text, ok3 := extraLoggerOption["dingTalkLogGroupKeyword"]; ok3 {
+				textStr, ok4 := text.(string)
+				if !ok4 {
+					keyword = "【北极星警告】【告警日志】"
+				} else {
+					keyword = textStr
+				}
+			} else {
+				keyword = "【北极星警告】【告警日志】"
+			}
+			sentryCfg := client.SentryCoreConfig{
+				Level: zap.ErrorLevel,
+				Tags: map[string]string{
+					"source": "runx",
+				},
+				ExtraStringOption: map[string]string{
+					"dingTalkLogGroupKeyword": keyword,
+				},
+			}
+			sentryCore := client.NewSentryCore(sentryCfg, sentryClient)
+			logger = logger.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+				return zapcore.NewTee(core, sentryCore)
+			}))
+		}
+	}
 
 	//s.log = logger.Sugar()
 	s.log = logger

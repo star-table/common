@@ -2,10 +2,10 @@ package kafka
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/core/util/json"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/core/util/json"
 	"strconv"
 	"testing"
 	"time"
@@ -24,14 +24,14 @@ func TestProxy_SendMessage(t *testing.T) {
 
 	reconsumer := 5
 
-	for i := 0; i < 10000; i ++{
+	for i := 0; i < 10000; i++ {
 		_, err := proxy.PushMessage(&model.MqMessage{
 			Topic:          topic,
 			Body:           strconv.Itoa(i),
 			ReconsumeTimes: &reconsumer,
 			RePushTimes:    &reconsumer,
 		})
-		fmt.Println("生产者",err)
+		fmt.Println("生产者", err)
 		time.Sleep(2 * time.Second)
 	}
 }
@@ -53,7 +53,5 @@ func TestProxy_ConsumePushMessage(t *testing.T) {
 		log.Info("最终失败:" + json.ToJsonIgnoreError(message))
 	})
 
-	select {
-
-	}
+	select {}
 }

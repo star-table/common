@@ -1,9 +1,9 @@
 package mysql
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/util/strs"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/util/strs"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 

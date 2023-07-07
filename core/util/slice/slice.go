@@ -7,50 +7,38 @@ import (
 
 //通过map去重slice
 func SliceUniqueString(s []string) []string {
-	size := len(s)
-	if size == 0 {
-		return []string{}
+	res := make([]string, 0)
+	exist := make(map[string]bool)
+	for _, s2 := range s {
+		if _, ok := exist[s2]; ok {
+			continue
+		}
+
+		res = append(res, s2)
+		exist[s2] = true
 	}
 
-	m := make(map[string]bool)
-	for i := 0; i < size; i++ {
-		m[s[i]] = true
-	}
-
-	realLen := len(m)
-	ret := make([]string, realLen)
-
-	idx := 0
-	for key := range m {
-		ret[idx] = key
-		idx++
-	}
-	return ret
+	return res
 }
 
 func SliceUniqueInt64(s []int64) []int64 {
-	size := len(s)
-	if size == 0 {
-		return []int64{}
+	res := make([]int64, 0)
+	exist := make(map[int64]bool)
+	for _, i2 := range s {
+		if _, ok := exist[i2]; ok {
+			continue
+		}
+		res = append(res, i2)
+		exist[i2] = true
 	}
 
-	m := make(map[int64]bool)
-	for i := 0; i < size; i++ {
-		m[s[i]] = true
-	}
-
-	realLen := len(m)
-	ret := make([]int64, realLen)
-
-	idx := 0
-	for key := range m {
-		ret[idx] = key
-		idx++
-	}
-	return ret
+	return res
 }
 
 func Contain(list interface{}, obj interface{}) (bool, error) {
+	if list == nil {
+		return false, nil
+	}
 	targetValue := reflect.ValueOf(list)
 	switch reflect.TypeOf(list).Kind() {
 	case reflect.Slice, reflect.Array:
@@ -70,6 +58,9 @@ func Contain(list interface{}, obj interface{}) (bool, error) {
 }
 
 func ToSlice(arr interface{}) []interface{} {
+	if arr == nil {
+		return []interface{}{}
+	}
 	v := reflect.ValueOf(arr)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()

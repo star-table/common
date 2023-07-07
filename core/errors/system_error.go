@@ -18,6 +18,8 @@ type ResultCodeInfo struct {
 	message string
 
 	langCode string
+	// 异常时，是否发送到 sentry
+	isNeedSentry bool
 }
 
 type SystemErrorInfo interface {
@@ -119,6 +121,26 @@ func AddResultCodeInfo(code int, message string, langCode string) ResultCodeInfo
 		code:     code,
 		message:  message,
 		langCode: langCode,
+	}
+
+	_codes[code] = rci
+	return rci
+}
+
+// 构造错误实例的构造函数。它构造的实例，带有发送异常到 sentry 的标识。
+func AddResultCodeInfoWithSentry(code int, message string, langCode string) ResultCodeInfo {
+	if code < 0 {
+		panic(fmt.Sprintf("result code: code %d must greater than zero", code))
+	}
+	if _, ok := _codes[code]; ok {
+		panic(fmt.Sprintf("result code: %d already exist", code))
+	}
+
+	rci := ResultCodeInfo{
+		code:         code,
+		message:      message,
+		langCode:     langCode,
+		isNeedSentry: true,
 	}
 
 	_codes[code] = rci

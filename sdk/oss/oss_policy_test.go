@@ -1,8 +1,8 @@
 package oss
 
 import (
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/util/json"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/util/json"
 	"testing"
 )
 

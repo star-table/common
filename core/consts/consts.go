@@ -23,6 +23,8 @@ const (
 	AppIsNoDelete = 2
 )
 
+const JaegerContextSpanKey = "JaegerContextSpanKey"
+
 const (
 	AppUserIsInUse     = 1
 	AppUserIsNotInUser = 2

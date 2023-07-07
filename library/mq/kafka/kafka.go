@@ -1,20 +1,21 @@
 package kafka
 
 import (
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/core/util/json"
-	"github.com/galaxy-book/common/core/util/strs"
-	"github.com/galaxy-book/common/core/util/uuid"
-	"github.com/galaxy-book/common/library/cache"
-	"github.com/Shopify/sarama"
-	"go.uber.org/zap"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Shopify/sarama"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/logger"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/core/util/json"
+	"github.com/star-table/common/core/util/strs"
+	"github.com/star-table/common/core/util/uuid"
+	"github.com/star-table/common/library/cache"
+	"go.uber.org/zap"
 )
 
 type Proxy struct {
@@ -36,8 +37,20 @@ const (
 
 func init() {
 	//生产者通用配置
+	//producerConfig.Version = version
+	//producerConfig.Net.KeepAlive = 0
+	//producerConfig.Metadata.RefreshFrequency = 30 * time.Second
+	//producerConfig.Producer.RequiredAcks = sarama.WaitForAll
+	//producerConfig.Producer.Partitioner = sarama.NewHashPartitioner
+	//producerConfig.Producer.Retry.Max = 10
+	//producerConfig.Producer.Retry.Backoff = 1000 * time.Millisecond
+	//producerConfig.Producer.Flush.Frequency = 100 * time.Millisecond // Flush batches every 100ms
+	//producerConfig.Producer.Flush.Bytes = 1048576
+	//producerConfig.Producer.Compression = sarama.CompressionSnappy // Compress messages
+	//producerConfig.Producer.Return.Successes = true
+	//producerConfig.Producer.Return.Errors = true
 	producerConfig.Producer.RequiredAcks = sarama.WaitForAll
-	producerConfig.Producer.Partitioner = sarama.NewRandomPartitioner
+	producerConfig.Producer.Partitioner = sarama.NewHashPartitioner
 	producerConfig.Producer.Return.Successes = true
 	producerConfig.Producer.Return.Errors = true
 	producerConfig.Version = version
@@ -70,7 +83,7 @@ func (proxy *Proxy) getProducer(topic string) (*sarama.AsyncProducer, errors.Sys
 		proxy.producers = map[string]sarama.AsyncProducer{}
 	}
 
-	if v, ok := proxy.producers[key]; ok && v != nil{
+	if v, ok := proxy.producers[key]; ok && v != nil {
 		return &v, nil
 	}
 
@@ -83,14 +96,14 @@ func (proxy *Proxy) getProducer(topic string) (*sarama.AsyncProducer, errors.Sys
 	if suc {
 		//如果获取到锁，则开始初始化
 		defer func() {
-			if _, err := cache.ReleaseDistributedLock(key, uuid); err != nil{
+			if _, err := cache.ReleaseDistributedLock(key, uuid); err != nil {
 				log.Error(err)
 			}
 		}()
 	}
 
 	//二次确认
-	if v, ok := proxy.producers[key]; ok && v != nil{
+	if v, ok := proxy.producers[key]; ok && v != nil {
 		return &v, nil
 	}
 
@@ -105,7 +118,7 @@ func (proxy *Proxy) getProducer(topic string) (*sarama.AsyncProducer, errors.Sys
 	return producer, nil
 }
 
-func (proxy *Proxy) CloseConnect(topic string) errors.SystemErrorInfo{
+func (proxy *Proxy) CloseConnect(topic string) errors.SystemErrorInfo {
 	proxy.producers[topic] = nil
 	return nil
 }
@@ -120,6 +133,35 @@ func (proxy *Proxy) buildProducer() (*sarama.AsyncProducer, errors.SystemErrorIn
 		return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, err)
 	}
 	return &producer, nil
+}
+
+func (proxy *Proxy) AsyncPushMessage(messages ...*model.MqMessage) errors.SystemErrorInfo {
+	for _, message := range messages {
+		ReconsumeTimes := config.GetKafkaConfig().ReconsumeTimes
+		if message.ReconsumeTimes != nil {
+			ReconsumeTimes = *message.ReconsumeTimes
+		}
+		msg := &sarama.ProducerMessage{
+			Topic: message.Topic,
+			Key:   sarama.StringEncoder(message.Keys),
+			Value: sarama.ByteEncoder(message.Body),
+			Headers: []sarama.RecordHeader{
+				{
+					Key:   []byte(RecordHeaderReconsumeTimes),
+					Value: []byte(strconv.Itoa(ReconsumeTimes)),
+				},
+			},
+		}
+
+		p, err := proxy.getProducerAutoConnect(message.Topic)
+		if err != nil {
+			log.Errorf("kafka getProducerAutoConnect failed: %v", err)
+			return err
+		}
+		producer := *p
+		producer.Input() <- msg
+	}
+	return nil
 }
 
 func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessageExt, errors.SystemErrorInfo) {
@@ -139,13 +181,13 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 			RePushTimes = *message.RePushTimes
 		}
 
-		key := uuid.NewUuid()
+		//key := uuid.NewUuid()
 		// send message
 		msg := &sarama.ProducerMessage{
-			Topic:     message.Topic,
-			Partition: message.Partition,
-			Key:       sarama.StringEncoder(key),
-			Value:     sarama.ByteEncoder(message.Body),
+			Topic: message.Topic,
+			//Partition: message.Partition,
+			Key:   sarama.StringEncoder(message.Keys),
+			Value: sarama.ByteEncoder(message.Body),
 			Headers: []sarama.RecordHeader{
 				{
 					Key:   []byte(RecordHeaderReconsumeTimes),
@@ -153,7 +195,6 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 				},
 			},
 		}
-
 
 		var pushErr error = nil
 		for rePushTime := 0; rePushTime <= RePushTimes; rePushTime++ {
@@ -165,23 +206,23 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 			producer := *p
 
 			if rePushTime > 0 {
-				log.Infof("重试次数%d，最大次数%d, 上次失败原因%v, 消息内容%s", rePushTime, message.RePushTimes, pushErr, json.ToJsonIgnoreError(message))
+				log.Infof("重试次数%d，最大次数%d, 上次失败原因%v, 消息内容%q", rePushTime, message.RePushTimes, pushErr, json.ToJsonBytesIgnoreError(message))
 			}
 			producer.Input() <- msg
 			select {
 			case suc := <-producer.Successes():
-				log.Infof("推送成功, offset: %d,  timestamp: %s， 消息内容%s", suc.Offset, suc.Timestamp.String(), json.ToJsonIgnoreError(message))
+				log.Infof("推送成功, offset: %d, timestamp: %s, 消息内容%q", suc.Offset, suc.Timestamp.String(), json.ToJsonBytesIgnoreError(message))
 				pushErr = nil
 			case fail := <-producer.Errors():
 				log.Errorf("err: %s\n", fail.Err.Error())
 				pushErr = fail.Err
 				//return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, fail)
 
-				if pushErr == sarama.ErrNotConnected || pushErr == sarama.ErrClosedClient || pushErr == sarama.ErrOutOfBrokers{
+				if pushErr == sarama.ErrNotConnected || pushErr == sarama.ErrClosedClient || pushErr == sarama.ErrOutOfBrokers {
 					log.Errorf("断开连接... %v", pushErr)
 					//重连
 					closeErr := proxy.CloseConnect(message.Topic)
-					if closeErr != nil{
+					if closeErr != nil {
 						log.Error(closeErr)
 					}
 				}
@@ -193,15 +234,15 @@ func (proxy *Proxy) PushMessage(messages ...*model.MqMessage) (*[]model.MqMessag
 		}
 		if pushErr != nil {
 			//最终推送失败，记log
-			log.Error("消息推送失败，无重试次数", zap.String(consts.LogMqMessageKey, json.ToJsonIgnoreError(message)))
+			log.Error("消息推送失败，无重试次数", zap.ByteString(consts.LogMqMessageKey, json.ToJsonBytesIgnoreError(message)))
 			return nil, errors.BuildSystemErrorInfo(errors.KafkaMqSendMsgError, pushErr)
 		}
-		log.Info("消息发送成功 %s", zap.String(consts.LogMqMessageKey, json.ToJsonIgnoreError(message)))
+		log.Info("消息发送成功", zap.ByteString(consts.LogMqMessageKey, json.ToJsonBytesIgnoreError(message)))
 		msgExts[i] = model.MqMessageExt{
 			MqMessage: model.MqMessage{
 				Topic:     msg.Topic,
 				Body:      message.Body,
-				Keys:      key,
+				Keys:      message.Keys,
 				Partition: msg.Partition,
 				Offset:    msg.Offset,
 			},

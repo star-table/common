@@ -1,19 +1,20 @@
 package json
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/types"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/types"
 	"testing"
 	"time"
 )
 
 type TA struct {
-	D time.Time
-	N string
+	D   time.Time
+	N   string
+	Age string `json:"age"`
 }
 
 func TestFromJson(t *testing.T) {
-	str := "{\"d\":\"2019-01-01 11:11:1000\",\"n\":\"1\"}"
+	str := "{\"d\":\"2019-01-01 11:11:1000\",\"n\":\"1\", \"age\":1}"
 	ta := &TA{}
 
 	FromJson(str, ta)
@@ -34,4 +35,3 @@ func TestToJson(t *testing.T) {
 	t.Log(consts.BlankTimeObject)
 	t.Log(types.Time(consts.BlankTimeObject))
 }
-

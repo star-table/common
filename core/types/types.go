@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/consts"
+	"github.com/star-table/common/core/consts"
 	"io"
 	"strings"
 	"time"

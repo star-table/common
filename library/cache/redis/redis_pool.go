@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/galaxy-book/common/core/config"
 	"github.com/gomodule/redigo/redis"
+	"github.com/star-table/common/core/config"
 
 	"strconv"
 )
@@ -42,6 +42,48 @@ func initRedisPool() {
 	}
 
 	timeout := time.Duration(5)
+
+	if rc.IsSentinel {
+		sntnl := &Sentinel{
+			Addrs:      []string{rc.Host + ":" + strconv.Itoa(rc.Port)},
+			MasterName: rc.MasterName,
+			Dial: func(addr string) (redis.Conn, error) {
+				c, err := redis.Dial("tcp", addr,
+					redis.DialPassword(rc.SentinelPwd),
+					redis.DialDatabase(rc.Database),
+					redis.DialConnectTimeout(timeout*time.Second),
+					redis.DialReadTimeout(timeout*time.Second),
+					redis.DialWriteTimeout(timeout*time.Second))
+				if err != nil {
+					return nil, err
+				}
+				return c, nil
+			},
+		}
+		redisClient = &redis.Pool{
+			MaxIdle:     maxIdle,
+			MaxActive:   maxActive,
+			IdleTimeout: time.Duration(maxIdleTimeout) * time.Second,
+			Wait:        true,
+			Dial: func() (redis.Conn, error) {
+				masterAddr, err := sntnl.MasterAddr()
+				if err != nil {
+					return nil, err
+				}
+				c, err := redis.Dial("tcp", masterAddr,
+					redis.DialPassword(rc.Pwd),
+					redis.DialDatabase(rc.Database),
+					redis.DialConnectTimeout(timeout*time.Second),
+					redis.DialReadTimeout(timeout*time.Second),
+					redis.DialWriteTimeout(timeout*time.Second))
+				if err != nil {
+					return nil, err
+				}
+				return c, nil
+			},
+		}
+		return
+	}
 
 	// 建立连接池
 	redisClient = &redis.Pool{

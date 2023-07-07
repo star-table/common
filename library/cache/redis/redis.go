@@ -1,18 +1,19 @@
 package redis
 
 import (
-	"github.com/galaxy-book/common/core/util/times"
+	"bytes"
+	"fmt"
 	"math/rand"
 	"reflect"
-	"sync"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/threadlocal"
+	"github.com/star-table/common/core/util/times"
+	"github.com/star-table/common/library/tracing"
 
 	"github.com/gomodule/redigo/redis"
 )
-
-var mu sync.Mutex
-var single Proxy
-
-type HashType map[string]string
 
 const (
 	_LockDistributedLua = "local v;" +
@@ -39,6 +40,10 @@ var (
 )
 
 type Proxy struct {
+	conn redis.Conn
+}
+
+type Conn struct {
 	conn redis.Conn
 }
 
@@ -110,14 +115,32 @@ func (rp *Proxy) MGet(keys ...interface{}) ([]string, error) {
 	}
 	return resultList, nil
 }
-func (rp *Proxy) MSet(kvs map[string]string) error{
+
+func (rp *Proxy) MGetFull(keys ...interface{}) ([]interface{}, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return nil, e
+	}
+	rs, err := conn.Do("MGET", keys...)
+	if err != nil {
+		return nil, err
+	}
+	if rs == nil {
+		return nil, err
+	}
+	list := rs.([]interface{})
+	return list, nil
+}
+
+func (rp *Proxy) MSet(kvs map[string]string) error {
 	conn, e := Connect()
 	defer Close(conn)
 	if e != nil {
 		return e
 	}
 	args := make([]interface{}, 0)
-	for k, v := range kvs{
+	for k, v := range kvs {
 		args = append(args, k, v)
 	}
 
@@ -129,9 +152,8 @@ func (rp *Proxy) MSet(kvs map[string]string) error{
 		return err
 	}
 
-	return  nil
+	return nil
 }
-
 
 func (rp *Proxy) Del(keys ...interface{}) (int64, error) {
 	conn, e := Connect()
@@ -206,7 +228,7 @@ func (rp *Proxy) TryGetDistributedLock(key string, v string) (bool, error) {
 
 	end := times.GetNowMillisecond() + _DistributedTimeOut*1000
 	for times.GetNowMillisecond() <= end {
-		rs, err := _LockDistributedLuaScript.Do(conn, key, v, _DistributedTimeOut)
+		rs, err := _LockDistributedLuaScript.Do(conn.conn, key, v, _DistributedTimeOut)
 		if err != nil {
 			return false, err
 		}
@@ -226,7 +248,7 @@ func (rp *Proxy) ReleaseDistributedLock(key string, v string) (bool, error) {
 		return false, e
 	}
 
-	rs, err := _UnLockDistributedLuaScript.Do(conn, key, v)
+	rs, err := _UnLockDistributedLuaScript.Do(conn.conn, key, v)
 	if err != nil {
 		return false, err
 	}
@@ -362,14 +384,74 @@ func (rp *Proxy) HINCRBY(key string, field string, increment int64) (int64, erro
 	return res.(int64), nil
 }
 
-func Connect() (redis.Conn, error) {
-	return GetRedisConn(), nil
+func (rp *Proxy) LPop(key string) (string, error) {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return "", e
+	}
+
+	res, err := conn.Do("LPOP", key)
+	if err != nil {
+		return "", err
+	}
+	if res == nil {
+		return "", nil
+	}
+	return string(res.([]byte)), nil
 }
 
-func Close(conn redis.Conn) error {
-	if conn != nil && conn.Err() == nil {
-		conn.Close()
-		return conn.Close()
+func (rp *Proxy) RPush(key string, fields ...interface{}) error {
+	conn, e := Connect()
+	defer Close(conn)
+	if e != nil {
+		return e
+	}
+	args := []interface{}{}
+	args = append(append(args, key), fields...)
+	_, err := conn.Do("RPUSH", args...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c Conn) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+	var span opentracing.Span
+	if tracing.EnableTracing() {
+		if v, ok := threadlocal.Mgr.GetValue(consts.JaegerContextSpanKey); ok {
+			if parentSpan, ok := v.(opentracing.Span); ok {
+				spanCtx := parentSpan.Context()
+				span = tracing.StartSpan("redis opt", opentracing.ChildOf(spanCtx))
+				span.SetTag("commands", commandName+argsToStr(args...))
+				span.SetTag("operation", "redis opt")
+			}
+		}
+	}
+	reply, err = c.conn.Do(commandName, args...)
+	if span != nil {
+		span.Finish()
+	}
+	return
+}
+
+func argsToStr(args ...interface{}) string {
+	bf := bytes.Buffer{}
+	for _, arg := range args {
+		bf.WriteString(fmt.Sprintf(" %v", arg))
+	}
+	return bf.String()
+}
+
+func Connect() (Conn, error) {
+	return Conn{
+		conn: GetRedisConn(),
+	}, nil
+}
+
+func Close(conn Conn) error {
+	if conn.conn != nil && conn.conn.Err() == nil {
+		return conn.conn.Close()
 	}
 	return nil
 }

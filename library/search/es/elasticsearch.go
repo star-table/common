@@ -2,8 +2,8 @@ package es
 
 import (
 	"errors"
-	"github.com/galaxy-book/common/core/config"
 	"github.com/olivere/elastic/v7"
+	"github.com/star-table/common/core/config"
 	"net/http"
 	"sync"
 	"time"

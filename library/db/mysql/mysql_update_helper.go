@@ -1,22 +1,14 @@
 package mysql
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/util/strs"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/util/strs"
 	"upper.io/db.v3"
 	"upper.io/db.v3/lib/sqlbuilder"
 )
 
 func Update(obj Domain) error {
 	conn, err := GetConnect()
-	defer func() {
-		if conn != nil {
-			if err := conn.Close(); err != nil {
-				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
-			}
-		}
-	}()
 	if err != nil {
 		return err
 	}
@@ -45,13 +37,6 @@ func UpdateSmart(table string, id int64, upd Upd) error {
 
 func UpdateSmartWithCond(table string, cond db.Cond, upd Upd) (int64, error) {
 	conn, err := GetConnect()
-	defer func() {
-		if conn != nil {
-			if err := conn.Close(); err != nil {
-				logger.GetDefaultLogger().Info(strs.ObjectToString(err))
-			}
-		}
-	}()
 	if err != nil {
 		return 0, err
 	}

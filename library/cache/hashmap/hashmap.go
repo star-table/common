@@ -1,11 +1,12 @@
 package hashmap
 
 import (
-	"github.com/galaxy-book/common/core/lock"
-	"github.com/galaxy-book/common/core/util/json"
-	"github.com/galaxy-book/common/core/util/slice"
 	"strconv"
 	"sync"
+
+	"github.com/star-table/common/core/lock"
+	"github.com/star-table/common/core/util/json"
+	"github.com/star-table/common/core/util/slice"
 )
 
 //var cacheMap = &CacheMap{
@@ -84,7 +85,17 @@ func (c *CacheMap) MGet(keys ...interface{}) ([]string, error) {
 	return resultList, nil
 }
 
-func (c *CacheMap) MSet(kvs map[string]string) error{
+func (c *CacheMap) MGetFull(keys ...interface{}) ([]interface{}, error) {
+	resultList := make([]interface{}, 0)
+	for _, key := range keys {
+		if v, ok := c.Cache.Load(key); ok {
+			resultList = append(resultList, v)
+		}
+	}
+	return resultList, nil
+}
+
+func (c *CacheMap) MSet(kvs map[string]string) error {
 	for k, v := range kvs {
 		c.Cache.Store(k, v)
 	}
@@ -240,4 +251,13 @@ func (c *CacheMap) HINCRBY(key string, field string, increment int64) (int64, er
 	count += increment
 	c.HSet(key, field, strconv.FormatInt(count, 10))
 	return count, nil
+}
+
+func (c *CacheMap) LPop(key string) (string, error) {
+	panic("CacheMap cannot support LPop")
+	return "", nil
+}
+func (c *CacheMap) RPush(key string, fields ...interface{}) error {
+	panic("CacheMap cannot support RPush")
+	return nil
 }

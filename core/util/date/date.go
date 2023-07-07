@@ -1,8 +1,8 @@
 package date
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/types"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/types"
 	"time"
 )
 

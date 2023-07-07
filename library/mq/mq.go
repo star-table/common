@@ -1,12 +1,12 @@
 package mq
 
 import (
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/library/mq/dbmq"
-	"github.com/galaxy-book/common/library/mq/kafka"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/library/mq/dbmq"
+	"github.com/star-table/common/library/mq/kafka"
 )
 
 type MQClient interface {
@@ -15,8 +15,8 @@ type MQClient interface {
 }
 
 var (
-	kafkaClient	   MQClient = &kafka.Proxy{}
-	dbMqClient		MQClient = &dbmq.DbMQProxy{}
+	kafkaClient MQClient = &kafka.Proxy{}
+	dbMqClient  MQClient = &dbmq.DbMQProxy{}
 )
 
 func GetMQClient() *MQClient {

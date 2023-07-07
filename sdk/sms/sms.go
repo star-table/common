@@ -2,11 +2,11 @@ package sms
 
 import (
 	"errors"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/util/json"
-	"github.com/galaxy-book/common/core/util/strs"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/logger"
+	"github.com/star-table/common/core/util/json"
+	"github.com/star-table/common/core/util/strs"
 )
 
 var log = logger.GetDefaultLogger()

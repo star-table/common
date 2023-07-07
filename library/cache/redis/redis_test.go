@@ -2,9 +2,9 @@ package redis
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/util/json"
 	"github.com/magiconair/properties/assert"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/util/json"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -13,11 +13,17 @@ import (
 
 func TestAvailability(t *testing.T) {
 	t.Logf("start load config")
-	config.LoadUnitTestConfig()
-
+	config.GetConfig().Redis = &config.RedisConfig{
+		Host:       "172.19.132.101",
+		Port:       26379,
+		IsSentinel: true,
+		MasterName: "mymaster",
+		Database:   0,
+	}
 	rp := GetProxy()
-
-	v, err := rp.Get("abcdaf")
+	err := rp.Set("abc", "abababba")
+	t.Log(err)
+	v, err := rp.Get("abc")
 	t.Log(err)
 	t.Log(v)
 

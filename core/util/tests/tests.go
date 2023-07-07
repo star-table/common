@@ -2,8 +2,8 @@ package tests
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
 	"github.com/polaris-team/dingtalk-sdk-golang/json"
+	"github.com/star-table/common/core/config"
 )
 
 func StartUp(f func()) func() {

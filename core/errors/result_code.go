@@ -29,7 +29,7 @@ var (
 	ServiceUnavailable = AddResultCodeInfo(503, "过载保护,服务暂不可用", "ResultCode.ServiceUnavailable")
 
 	//服务调用超时
-	Deadline = AddResultCodeInfo(504, "服务调用超时", "ResultCode.Deadline")
+	Deadline = AddResultCodeInfoWithSentry(504, "服务调用超时", "ResultCode.Deadline")
 
 	//超出限制
 	LimitExceed = AddResultCodeInfo(509, "超出限制", "ResultCode.LimitExceed")
@@ -64,6 +64,12 @@ var (
 	//未知错误
 	UnknownError = AddResultCodeInfo(999, "未知错误", "ResultCode.UnknownError")
 
+	//Panic错误
+	PanicError = AddResultCodeInfoWithSentry(1000, "Panic错误", "ResultCode.PanicError")
+
+	//数据库错误
+	DatabaseError = AddResultCodeInfoWithSentry(1001, "Database错误", "ResultCode.DatabaseError")
+
 	RocketMQProduceInitError   = AddResultCodeInfo(10001, "RocketMQ Produce 初始化异常", "ResultCode.RocketMQProduceInitError")
 	RocketMQSendMsgError       = AddResultCodeInfo(10002, "RocketMQ SendMsg 失败", "ResultCode.RocketMQSendMsgError")
 	RocketMQConsumerInitError  = AddResultCodeInfo(10003, "RocketMQ Consumer 初始化异常", "ResultCode.RocketMQConsumerInitError")
@@ -73,14 +79,17 @@ var (
 	KafkaMqSendMsgError           = AddResultCodeInfo(10101, "Kafka发送消息失败", "ResultCode.KafkaMqSendMsgError")
 	KafkaMqSendMsgCantBeNullError = AddResultCodeInfo(10102, "Kafka发送的消息不能为空", "ResultCode.KafkaMqSendMsgCantBeNullError")
 	KafkaMqConsumeMsgError        = AddResultCodeInfo(10103, "Kafka消费消息失败", "ResultCode.KafkaMqConsumeMsgError")
-	KafkaMqConsumeStartError        = AddResultCodeInfo(10104, "Kafka消费启动失败", "ResultCode.KafkaMqConsumeStartError")
+	KafkaMqConsumeStartError      = AddResultCodeInfo(10104, "Kafka消费启动失败", "ResultCode.KafkaMqConsumeStartError")
 
 	TryDistributedLockError = AddResultCodeInfo(10201, "获取分布式锁异常", "ResultCode.TryDistributedLockError")
-	GetDistributedLockError    = AddResultCodeInfo(10202, "获取分布式锁失败", "ResultCode.GetDistributedLockError")
-	MysqlOperateError          = AddResultCodeInfo(10203, "db操作出现异常", "ResultCode.MysqlOperateError")
-	RedisOperateError          = AddResultCodeInfo(10204, "redis操作出现异常", "ResultCode.RedisOperateError")
+	GetDistributedLockError = AddResultCodeInfo(10202, "获取分布式锁失败", "ResultCode.GetDistributedLockError")
+	MysqlOperateError       = AddResultCodeInfo(10203, "db操作出现异常", "ResultCode.MysqlOperateError")
+	RedisOperateError       = AddResultCodeInfo(10204, "redis操作出现异常", "ResultCode.RedisOperateError")
 
 	DbMQSendMsgError         = AddResultCodeInfo(10301, "Db 保存 message queue 失败", "ResultCode.DbMQSendMsgError")
 	DbMQCreateConsumerError  = AddResultCodeInfo(10302, "Db 创建 message queue consumer 失败", "ResultCode.DbMQCreateConsumerError")
 	DbMQConsumerStartedError = AddResultCodeInfo(10303, "Db 创建 message queue consumer 已启动", "ResultCode.DbMQConsumerStartedError")
+
+	MQTTNoClientError = AddResultCodeInfo(10401, "Mqtt 无可用Client", "ResultCode.MQTTNoClientError")
+	MQTTNoConfigError = AddResultCodeInfo(10402, "Mqtt 无配置", "ResultCode.MQTTNoConfigError")
 )

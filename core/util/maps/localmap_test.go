@@ -1,8 +1,9 @@
 package maps
 
 import (
-	"github.com/galaxy-book/common/core/util/json"
 	"testing"
+
+	"github.com/star-table/common/core/util/json"
 )
 
 type TestStruct struct {

@@ -2,9 +2,9 @@ package types
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/util/copyer"
-	"github.com/galaxy-book/common/core/util/json"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/util/copyer"
+	"github.com/star-table/common/core/util/json"
 	"testing"
 	"time"
 )

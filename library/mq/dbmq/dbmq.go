@@ -1,14 +1,14 @@
 package dbmq
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/errors"
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/core/util/id/snowflake"
-	"github.com/galaxy-book/common/core/util/strs"
-	"github.com/galaxy-book/common/core/util/times"
-	"github.com/galaxy-book/common/library/db/mysql"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/logger"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/core/util/id/snowflake"
+	"github.com/star-table/common/core/util/strs"
+	"github.com/star-table/common/core/util/times"
+	"github.com/star-table/common/library/db/mysql"
 	"strconv"
 	"sync"
 	"time"

@@ -1,11 +1,12 @@
 package cache
 
 import (
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/library/cache/hashmap"
-	"github.com/galaxy-book/common/library/cache/redis"
 	"sync"
+
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/library/cache/hashmap"
+	"github.com/star-table/common/library/cache/redis"
 )
 
 type Cache interface {
@@ -17,6 +18,7 @@ type Cache interface {
 	Expire(key string, expire int64) (bool, error)
 	Incrby(key string, v int64) (int64, error)
 	MGet(keys ...interface{}) ([]string, error)
+	MGetFull(keys ...interface{}) ([]interface{}, error)
 	MSet(kvs map[string]string) error
 	HGet(key, field string) (string, error)
 	HSet(key, field, value string) error
@@ -25,6 +27,8 @@ type Cache interface {
 	HMGet(key string, fields ...interface{}) (map[string]*string, error)
 	HMSet(key string, fieldValue map[string]string) error
 	HINCRBY(key string, field string, increment int64) (int64, error)
+	LPop(key string) (string, error)
+	RPush(key string, fields ...interface{}) error
 
 	TryGetDistributedLock(key string, v string) (bool, error)
 	ReleaseDistributedLock(key string, v string) (bool, error)
@@ -53,7 +57,7 @@ func Set(key string, value string) error {
 	return getCache().Set(key, value)
 }
 
-func MSet(kvs map[string]string) error{
+func MSet(kvs map[string]string) error {
 	return getCache().MSet(kvs)
 }
 
@@ -89,6 +93,10 @@ func MGet(keys ...interface{}) ([]string, error) {
 	return getCache().MGet(keys...)
 }
 
+func MGetFull(keys ...interface{}) ([]interface{}, error) {
+	return getCache().MGetFull(keys...)
+}
+
 func HGet(key, field string) (string, error) {
 	return getCache().HGet(key, field)
 }
@@ -115,4 +123,12 @@ func HMSet(key string, fieldValue map[string]string) error {
 
 func HINCRBY(key string, field string, increment int64) (int64, error) {
 	return getCache().HINCRBY(key, field, increment)
+}
+
+func LPop(key string) (string, error) {
+	return getCache().LPop(key)
+}
+
+func RPush(key string, fields ...interface{}) error {
+	return getCache().RPush(key, fields...)
 }

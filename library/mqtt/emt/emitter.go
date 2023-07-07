@@ -1,157 +1,172 @@
 package emt
 
 import (
-	"errors"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/lock"
-	"github.com/galaxy-book/common/core/logger"
-	"github.com/galaxy-book/common/core/util/json"
-	emitter "github.com/emitter-io/go/v2"
-	"strconv"
-	"sync"
-	"time"
+	"sync/atomic"
+
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/errors"
+	"github.com/star-table/common/core/logger"
+	"github.com/star-table/common/core/util/json"
+	emitter "github.com/star-table/emitter-go-client"
 )
 
-var (
-	mqttMutex sync.Mutex
-	log = logger.GetDefaultLogger()
-	disConnectErr = errors.New("mqtt disconnected!")
-	clients []*emitter.Client = nil
-	)
+var log = logger.GetDefaultLogger()
+var _clients []*emitter.Client = nil
+var _next uint32 = 0
 
-func GetClient() (*emitter.Client, error){
-	client, selector, err := Connect(nil)
-	if err != nil{
-		log.Error(err)
-		return nil, err
+func Init() error {
+	conf := config.GetMQTTConfig()
+	if conf == nil {
+		log.Error("[MQTT] cannot get config.")
+		return errors.MQTTNoConfigError
 	}
-	if client == nil{
-		return nil, disConnectErr
+	if !conf.Enable {
+		log.Info("[MQTT] disabled.")
+		return nil
 	}
 
-	//fmt.Printf("selector %d\n", selector)
+	log.Infof("[MQTT] init config: %q", json.ToJsonBytesIgnoreError(conf))
 
-	//断开连接，重试一次
-	if ! client.IsConnected(){
-		log.Infof("连接断开，开始重连...")
+	clientCount := conf.ConnectPoolSize
+	if clientCount <= 0 {
+		clientCount = 10
+	}
+	_clients = make([]*emitter.Client, clientCount, clientCount)
 
-		key := strconv.Itoa(selector)
-		lock.Lock(key)
-		defer lock.Unlock(key)
-		client = clients[selector]
-		if client == nil || ! client.IsConnected(){
-			clients[selector] = nil
-			client, _, err = Connect(nil)
-			if err != nil{
-				log.Error(err)
-				return nil, err
-			}
-			if ! client.IsConnected(){
-				return nil, disConnectErr
-			}
+	// init each client
+	for i := 0; i < clientCount; i++ {
+		c, err := emitter.Connect(conf.Address, nil)
+		if err != nil || !c.IsConnected() {
+			log.Errorf("[MQTT] client %v init failed: %v, err: %v", i, conf.Address, err)
+			return err
 		}
+		_clients[i] = c
 	}
+	return nil
+}
+
+// RoundRobin get next index
+func nextI() int {
+	total := len(_clients)
+	if total == 0 {
+		return -1
+	}
+
+	n := atomic.AddUint32(&_next, 1)
+	return (int(n) - 1) % total
+}
+
+func GetClient() (*emitter.Client, error) {
+	var client *emitter.Client
+	var i int
+	tryTimes := 0
+	conf := config.GetMQTTConfig()
+	if conf == nil {
+		log.Error("[MQTT] get client failed, cannot get config.")
+		return nil, errors.MQTTNoConfigError
+	}
+
+RETRY:
+	tryTimes += 1
+	if tryTimes > len(_clients) {
+		log.Errorf("[MQTT] get client failed, retry %v times!!!", tryTimes)
+		return nil, errors.MQTTNoClientError
+	}
+
+	i = nextI()
+	if i == -1 {
+		// 理论上不可能走进的分支
+		log.Errorf("[MQTT] get client failed, no client.")
+		return nil, errors.MQTTNoClientError
+	}
+	client = _clients[i]
+
+	// 理论上不可能走进的分支
+	if client == nil {
+		log.Errorf("[MQTT] get client failed, client %v is nil.", i)
+		return nil, errors.MQTTNoClientError
+	}
+
+	// 理论上不可能走进的分支
+	if !client.IsConnected() {
+		log.Errorf("[MQTT] client [%v] is not connected, use next.", i)
+		goto RETRY
+	}
+
+	// 默认自动重连是开启的，如果IsConnectionOpen=False则意味着底层连接正在自动重新连接状态
+	// 此时跳过此连接，直接使用下一个连接
+	if !client.IsConnectionOpen() {
+		log.Infof("[MQTT] client [%v] connection is not open, use next.", i)
+		goto RETRY
+	}
+
 	return client, nil
 }
 
-func Connect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, int, error){
-	initPool()
-
-	selector := int(time.Now().Unix() & int64(len(clients) - 1))
-	selectClient := clients[selector]
-
-	if selectClient == nil {
-		mqttMutex.Lock()
-		defer mqttMutex.Unlock()
-
-		selectClient = clients[selector]
-		if selectClient == nil {
-			mqttConfig := config.GetMQTTConfig()
-			if mqttConfig == nil{
-				panic("missing mqtt config.")
-			}
-
-			log.Infof("mqtt config %s", json.ToJsonIgnoreError(mqttConfig))
-
-			if mqttConfig.Enable{
-				var err error
-				clients[selector], err = emitter.Connect(mqttConfig.Address, handler, options...)
-				if err != nil{
-					log.Error(err)
-					return nil, selector, err
-				}
-			}else{
-				log.Error("mqtt已被禁用")
-			}
-		}
-
-	}
-	return clients[selector], selector, nil
-}
-
-func initPool(){
-	mqttConfig := config.GetMQTTConfig()
-	if mqttConfig == nil{
-		panic("missing mqtt config.")
+func GetNativeConnect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, error) {
+	conf := config.GetMQTTConfig()
+	if conf == nil {
+		return nil, errors.MQTTNoConfigError
 	}
 
-	if clients == nil{
-		mqttMutex.Lock()
-		defer mqttMutex.Unlock()
-		if clients == nil{
-			poolSize := mqttConfig.ConnectPoolSize
-			if poolSize <= 0{
-				poolSize = 10
-			}
-			clients = make([]*emitter.Client, poolSize)
-		}
-	}
-}
+	log.Infof("[MQTT] GetNativeConnect config %q", json.ToJsonBytesIgnoreError(conf))
 
-func GetNativeConnect(handler emitter.MessageHandler, options ...func(*emitter.Client)) (*emitter.Client, error){
-	mqttConfig := config.GetMQTTConfig()
-	if mqttConfig == nil{
-		return nil, errors.New("missing mqtt config.")
-	}
-
-	log.Infof("mqtt config %s", json.ToJsonIgnoreError(mqttConfig))
-
-	mc, err := emitter.Connect(mqttConfig.Address, handler, options...)
-	if err != nil{
+	c, err := emitter.Connect(conf.Address, handler, options...)
+	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	return mc, nil
+	return c, nil
 }
 
-func GenerateKey(channel string, permissions string, ttl int) (string, error){
+// 先搞明白客户端目前请求GenerateKey的频率, KEY的TTL设置是否必要？REDIS缓存要加上
+func GenerateKey(channel string, permissions string, ttl int) (string, error) {
 	client, err := GetClient()
-	if err != nil{
-		log.Error(err)
+	if err != nil {
+		log.Errorf("[MQTT] GenerateKey channel: %v, permissions: %s, ttl: %d, cannot get client: %v",
+			channel, permissions, ttl, err)
 		return "", err
 	}
-	mqttConfig := config.GetMQTTConfig()
-	if mqttConfig == nil{
-		panic("missing mqtt config.")
+	conf := config.GetMQTTConfig()
+	if conf == nil {
+		log.Errorf("[MQTT] GenerateKey channel: %v, permissions: %s, ttl: %d, no config.",
+			channel, permissions, ttl)
+		return "", errors.MQTTNoConfigError
 	}
-	secretKey := mqttConfig.SecretKey
 
-	key, err := client.GenerateKey(secretKey, channel, permissions, ttl)
-	if err != nil{
-		log.Error(err)
+	key, err := client.GenerateKey(conf.SecretKey, channel, permissions, ttl)
+	if err != nil {
+		log.Errorf("[MQTT] GenerateKey channel: %v, permissions: %s, ttl: %d, failed: %v.",
+			channel, permissions, ttl, err)
 		return "", err
 	}
 	return key, nil
 }
 
-func Publish(key, channel string, payload interface{}, handler emitter.ErrorHandler) error{
+func Publish(key, channel string, payload interface{}, ttl int, handler emitter.ErrorHandler) error {
 	client, err := GetClient()
-	if err != nil{
-		log.Error(err)
+	if err != nil {
+		log.Errorf("[MQTT] Publish key: %v, channel: %v, payload: %v, cannot get client: %v.",
+			key, channel, payload, err)
 		return err
 	}
-	if handler != nil{
+	if handler != nil {
 		client.OnError(handler)
 	}
-	return client.Publish(key, channel, payload, emitter.WithAtLeastOnce())
+	if ttl > 0 {
+		go func() {
+			if err = client.Publish(key, channel, payload, emitter.WithAtLeastOnce(), emitter.WithTTL(ttl)); err != nil {
+				log.Errorf("[MQTT] Publish key: %v, channel: %v, payload: %v, failed: %v.",
+					key, channel, payload, err)
+			}
+		}()
+	} else {
+		go func() {
+			if err = client.Publish(key, channel, payload, emitter.WithAtLeastOnce()); err != nil {
+				log.Errorf("[MQTT] Publish key: %v, channel: %v, payload: %v, failed: %v.",
+					key, channel, payload, err)
+			}
+		}()
+	}
+	return nil
 }

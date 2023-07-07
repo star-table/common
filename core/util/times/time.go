@@ -1,9 +1,9 @@
 package times
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/types"
-	"github.com/galaxy-book/common/core/util/date"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/types"
+	"github.com/star-table/common/core/util/date"
 	"time"
 )
 
@@ -67,7 +67,7 @@ func GetTodayTimeQuantum() []time.Time {
 }
 
 //2019-09-03
-func GetYesterdayDate() string{
+func GetYesterdayDate() string {
 	timeStr := time.Now().Format(consts.AppDateFormat)
 	b, _ := time.Parse(consts.AppDateFormat, timeStr)
 	a := b.Add(time.Duration(-1) * time.Millisecond)

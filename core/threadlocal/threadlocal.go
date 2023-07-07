@@ -1,10 +1,10 @@
 package threadlocal
 
 import (
-	"github.com/galaxy-book/common/core/consts"
-	"github.com/galaxy-book/common/core/model"
-	"github.com/galaxy-book/common/core/util/uuid"
 	"github.com/jtolds/gls"
+	"github.com/star-table/common/core/consts"
+	"github.com/star-table/common/core/model"
+	"github.com/star-table/common/core/util/uuid"
 )
 
 var (
@@ -34,4 +34,13 @@ func GetTraceId() string {
 func SetTraceId() {
 
 	Mgr.SetValues(gls.Values{consts.TraceIdKey: uuid.NewUuid()}, func() {})
+}
+
+func GetValue(key string) string {
+	if traceId, ok := Mgr.GetValue(key); ok {
+		if traceId != nil {
+			return traceId.(string)
+		}
+	}
+	return ""
 }

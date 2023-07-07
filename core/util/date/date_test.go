@@ -2,9 +2,9 @@ package date
 
 import (
 	"fmt"
-	"github.com/galaxy-book/common/core/config"
-	"github.com/galaxy-book/common/core/types"
-	"github.com/galaxy-book/common/core/util/tests"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/types"
+	"github.com/star-table/common/core/util/tests"
 	"testing"
 	"time"
 

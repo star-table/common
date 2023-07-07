@@ -1,7 +1,7 @@
 package mail
 
 import (
-	"github.com/galaxy-book/common/core/config"
+	"github.com/star-table/common/core/config"
 	"testing"
 )
 
