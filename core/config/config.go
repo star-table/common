@@ -1,17 +1,21 @@
 package config
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
-	"strings"
+	nacosconfig "github.com/go-kratos/kratos/contrib/config/nacos/v2"
+	"github.com/go-kratos/kratos/v2/config"
+	"github.com/nacos-group/nacos-sdk-go/clients"
+	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
+	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/spf13/cast"
+	"gopkg.in/yaml.v2"
 
+	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	remote "github.com/yoyofxteam/nacos-viper-remote"
+	"os"
 )
 
 var conf = &Config{
@@ -772,218 +776,87 @@ func GetOfficeUrl() string {
 	return officeUrl
 }
 
-func LoadConfig(dir string, config string) error {
-	return LoadEnvConfig(dir, config, "")
+func LoadConfig(flagconf, nacosHost, nacosPort, nacosNamespace, appName string) error {
+	return loadConfig(flagconf, nacosHost, nacosPort, nacosNamespace, appName)
 }
 
-func LoadExtraConfig(dir string, config string, extraConfig interface{}) error {
-	return LoadExtraEnvConfig(dir, config, "", extraConfig)
-}
+func loadConfig(flagconf, nacosHost, nacosPort, nacosNamespace, appName string) error {
+	flag.Parse()
+	if flagconf != "" {
+		c := config.New(
+			config.WithSource(
+				file.NewSource(flagconf),
+			),
+		)
+		defer c.Close()
 
-func LoadUnitTestConfig() {
-	//configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
-	configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
+		if err := c.Load(); err != nil {
+			panic(err)
+		}
 
-	configName := "application.common"
-	env := "local"
-	for _, arg := range flag.Args() {
-		argList := strings.Split(arg, "=")
-		if len(argList) != 2 {
-			argList = strings.Split(arg, " ")
+		if err := c.Scan(&conf); err != nil {
+			panic(err)
 		}
-		if len(argList) != 2 {
-			fmt.Printf(" unknown arg:%v\n", arg)
-			continue
-		}
-		arg0 := strings.TrimSpace(argList[0])
-		if arg0 == "p" || arg0 == "P" {
-			configPath = argList[1]
-		}
-		if arg0 == "n" || arg0 == "N" {
-			configName = argList[1]
-		}
-		if arg0 == "e" || arg0 == "E" {
-			env = argList[1]
-		}
+
+		return nil
 	}
-	LoadEnvConfig(configPath, configName, env)
+
+	return loadNacosConfig(nacosHost, nacosPort, nacosNamespace, appName)
 }
 
-func LoadUnitTestConfigWithEnv(env string) {
-	configPath := "/Users/tree/work/08_all_star/01_src/go/polaris-backend/config"
-	//configPath := "F:\\workspace-golang-polaris\\polaris-backend\\config"
-
-	configName := "application.common"
-	// env := "local"
-	for _, arg := range flag.Args() {
-		argList := strings.Split(arg, "=")
-		if len(argList) != 2 {
-			argList = strings.Split(arg, " ")
-		}
-		if len(argList) != 2 {
-			fmt.Printf(" unknown arg:%v\n", arg)
-			continue
-		}
-		arg0 := strings.TrimSpace(argList[0])
-		if arg0 == "p" || arg0 == "P" {
-			configPath = argList[1]
-		}
-		if arg0 == "n" || arg0 == "N" {
-			configName = argList[1]
-		}
-		if arg0 == "e" || arg0 == "E" {
-			env = argList[1]
-		}
-	}
-	LoadEnvConfig(configPath, configName, env)
-}
-
-func LoadEnvConfig(dir string, config string, env string) error {
-	err := loadConfig(dir, config, "")
+func loadNacosConfig(nacosHost, nacosPort, nacosNamespace, appName string) error {
+	client, err := getNacosConfigClient(nacosHost, nacosPort, nacosNamespace, appName)
 	if err != nil {
 		return err
 	}
-	if env != "" {
-		err = loadConfig(dir, config, env)
-		if err != nil {
-			return err
-		}
+
+	configSource := nacosconfig.NewConfigSource(client, nacosconfig.WithGroup("DEFAULT_GROUP"), nacosconfig.WithDataID(appName))
+
+	c := config.New(
+		config.WithSource(
+			configSource,
+		),
+		config.WithDecoder(func(kv *config.KeyValue, v map[string]interface{}) error {
+			return yaml.Unmarshal(kv.Value, v)
+		}),
+	)
+
+	if err := c.Load(); err != nil {
+		return err
 	}
+
+	if err := c.Scan(&conf); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func LoadExtraEnvConfig(dir string, config string, env string, extraConfig interface{}) error {
-	err := loadExtraConfig(dir, config, "", extraConfig)
-	if err != nil {
-		return err
-	}
-	if env != "" {
-		err = loadExtraConfig(dir, config, env, extraConfig)
-		if err != nil {
-			return err
+func getNacosServerAndClientConfig(nacosHost, nacosPort, nacosNamespace, appName string) ([]constant.ServerConfig, constant.ClientConfig) {
+	return []constant.ServerConfig{
+			*constant.NewServerConfig(nacosHost, cast.ToUint64(nacosPort)),
+		},
+		constant.ClientConfig{
+			AppName:             appName,
+			NamespaceId:         nacosNamespace, //namespace id
+			TimeoutMs:           5000,
+			NotLoadCacheAtStart: true,
+			LogLevel:            "error",
 		}
-	}
-	return nil
 }
 
-func loadExtraConfig(dir string, config string, env string, extraConfig interface{}) error {
-	err := loadConfig(dir, config, env)
-	if err != nil {
-		return err
-	}
-	if err := conf.Viper.Unmarshal(&extraConfig); err != nil {
-		return err
-	}
-	return nil
-}
+func getNacosConfigClient(nacosHost, nacosPort, nacosNamespace, appName string) (config_client.IConfigClient, error) {
+	sc, cc := getNacosServerAndClientConfig(nacosHost, nacosPort, nacosNamespace, appName)
+	// a more graceful way to create naming client
+	client, err := clients.NewConfigClient(
+		vo.NacosClientParam{
+			ClientConfig:  &cc,
+			ServerConfigs: sc,
+		},
+	)
 
-func loadConfig(dir string, config string, env string) error {
-	configName := config
-	if env != "" {
-		configName += "." + env
-	}
-	if conf.Viper == nil {
-		conf.Viper = viper.New()
-	}
-	conf.Viper.SetConfigName(configName)
-	conf.Viper.AddConfigPath(dir)
-	conf.Viper.SetConfigType("yaml")
-	if err := conf.Viper.MergeInConfig(); err != nil {
-		fmt.Println(err)
-		return err
-	}
-	if err := conf.Viper.Unmarshal(&conf); err != nil {
-		fmt.Println(err)
-		return err
-	}
-	return nil
-}
-
-func LoadNacosConfigAutoConfiguration(applicationName, env string) error {
-	host := os.Getenv("REGISTER_HOST")
-	if host == "" {
-		return errors.New("nacos host is empty")
-	}
-	portStr := os.Getenv("REGISTER_PORT")
-	if portStr == "" {
-		return errors.New("nacos port is empty")
-	}
-	port, err := strconv.ParseUint(portStr, 10, 64)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	namespaceId := os.Getenv("REGISTER_NAMESPACE")
-	if namespaceId == "" {
-		return errors.New("nacos namespaceId is empty")
-	}
-	username := os.Getenv("REGISTER_USERNAME")
-	password := os.Getenv("REGISTER_PASSWORD")
-	return LoadNacosConfigAutoExtends(host, port, namespaceId, applicationName, env, username, password)
-}
-
-func LoadNacosConfigAutoExtends(host string, port uint64, namespaceId, applicationName, env string, username, password string) error {
-	err := LoadNacosConfig(host, port, "polaris-common", "DEFAULT_GROUP", "application.common.yaml", username, password)
-	if err != nil {
-		return err
-	}
-	err = LoadNacosConfig(host, port, namespaceId, "DEFAULT_GROUP", "application.common."+env+".yaml", username, password)
-	if err != nil {
-		return err
-	}
-	err = LoadNacosConfig(host, port, "polaris-common", "DEFAULT_GROUP", "application."+applicationName+".yaml", username, password)
-	if err != nil {
-		return err
-	}
-	err = LoadNacosConfig(host, port, namespaceId, "DEFAULT_GROUP", "application."+applicationName+".yaml", username, password)
-	return err
-}
-
-func LoadNacosConfig(host string, port uint64, namespaceId, group, dataId string, username, password string) error {
-	var auth *remote.Auth
-	if username != "" && password != "" {
-		auth = &remote.Auth{
-			Enable:   true,
-			User:     username,
-			Password: password,
-		}
-	}
-	remote.SetOptions(&remote.Option{
-		Url:         host,
-		Port:        port,
-		NamespaceId: namespaceId,
-		GroupName:   group,
-		Config:      remote.Config{DataId: dataId},
-		Auth:        auth,
-	})
-	if conf.Viper == nil {
-		conf.Viper = viper.New()
-	}
-	err := conf.Viper.AddRemoteProvider("nacos", host, "")
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	conf.Viper.SetConfigType("yaml")
-	err = conf.Viper.ReadRemoteConfig()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	remote.NewRemoteProvider("yaml")
-	respChan, _ := viper.RemoteConfig.WatchChannel(remote.DefaultRemoteProvider())
-	go func(rc <-chan *viper.RemoteResponse) {
-		for {
-			b := <-rc
-			reader := bytes.NewReader(b.Value)
-			err := conf.Viper.MergeConfig(reader)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}(respChan)
-	if err := conf.Viper.Unmarshal(&conf); err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
+	return client, nil
 }
