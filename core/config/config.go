@@ -440,6 +440,16 @@ type WechatConfig struct {
 	AesKey         string `json:"aesKey"`
 }
 
+type NacosBaseConfig struct {
+	AppName   string
+	Host      string
+	Port      string
+	NameSpace string
+	UserName  string
+	Password  string
+	Group     string
+}
+
 func GetYiDunConfig() *YiDunConfig {
 	return conf.YiDun
 }

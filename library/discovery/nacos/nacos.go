@@ -2,13 +2,8 @@ package nacos
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
-	"github.com/star-table/common/core/config"
-	"github.com/star-table/common/core/logger"
-	"github.com/star-table/common/core/util/http"
-	"github.com/star-table/common/core/util/network"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
@@ -16,6 +11,10 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/pkg/errors"
+	"github.com/star-table/common/core/config"
+	"github.com/star-table/common/core/logger"
+	"github.com/star-table/common/core/util/http"
+	"github.com/star-table/common/core/util/network"
 )
 
 var (
@@ -23,12 +22,11 @@ var (
 	log         = logger.GetDefaultLogger()
 )
 
-func Init() {
-	if config.GetConfig().Nacos == nil {
-		log.Info("nacos not config.")
+func Init(c *config.NacosBaseConfig) {
+	if c.Host == "" {
 		return
 	}
-	client, err := NewNacosClient(config.GetConfig().Nacos)
+	client, err := NewNacosClient(c)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -39,35 +37,30 @@ func Init() {
 		host = network.GetIntranetIp()
 	}
 
-	metaData := config.GetConfig().Nacos.Discovery.MetaData
-	if metaData == nil {
-		metaData = map[string]string{
-			"kind":    "http",
-			"version": "",
-		}
+	metaData := map[string]string{
+		"kind":    "http",
+		"version": "",
 	}
 
-	if config.GetConfig().Nacos.Discovery.Enable {
-		suc, err := nacosClient.RegisterInstance(vo.RegisterInstanceParam{
-			Ip:          host,
-			Port:        uint64(config.GetConfig().Server.Port),
-			ServiceName: config.GetConfig().Application.Name,
-			GroupName:   config.GetConfig().Nacos.Discovery.GroupName,
-			ClusterName: config.GetConfig().Nacos.Discovery.ClusterName,
-			Weight:      config.GetConfig().Nacos.Discovery.Weight,
-			Enable:      config.GetConfig().Nacos.Discovery.Enable,
-			Healthy:     config.GetConfig().Nacos.Discovery.Healthy,
-			Ephemeral:   config.GetConfig().Nacos.Discovery.Ephemeral,
-			Metadata:    metaData,
-		})
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-		if !suc {
-			log.Fatal("服务注册失败")
-			return
-		}
+	suc, err := nacosClient.RegisterInstance(vo.RegisterInstanceParam{
+		Ip:          host,
+		Port:        uint64(config.GetConfig().Server.Port),
+		ServiceName: c.AppName,
+		GroupName:   c.Group,
+		ClusterName: "DEFAULT",
+		Weight:      1.0,
+		Enable:      true,
+		Healthy:     true,
+		Ephemeral:   true,
+		Metadata:    metaData,
+	})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	if !suc {
+		log.Fatal("服务注册失败")
+		return
 	}
 }
 
@@ -76,25 +69,13 @@ type NacosClient struct {
 	configClient config_client.IConfigClient
 }
 
-var (
-	emptyClientConf = config.NacosClientConfig{}
-	defaultClient   = constant.ClientConfig{
-		TimeoutMs:      10 * 1000,
-		ListenInterval: 30 * 1000,
-		BeatInterval:   5 * 1000,
-	}
-)
-
 func GetNacosClient() *NacosClient {
 	return nacosClient
 }
 
-func NewNacosClient(conf *config.NacosConfig) (*NacosClient, error) {
-	if len(conf.Server) == 0 {
-		return nil, errors.Errorf("nacos server config cannot empty\n")
-	}
-	serverConfig := newServerConfigs(conf.Server)
-	clientConfig := newClientConfig(conf.Client)
+func NewNacosClient(conf *config.NacosBaseConfig) (*NacosClient, error) {
+	serverConfig := newServerConfigs(conf)
+	clientConfig := newClientConfig(conf)
 
 	naming, err := newNamingClient(serverConfig, clientConfig)
 	if err != nil {
@@ -110,46 +91,31 @@ func NewNacosClient(conf *config.NacosConfig) (*NacosClient, error) {
 	}, nil
 }
 
-func newClientConfig(conf config.NacosClientConfig) constant.ClientConfig {
-	if conf == emptyClientConf {
-		return defaultClient
-	}
+func newClientConfig(conf *config.NacosBaseConfig) constant.ClientConfig {
 	return constant.ClientConfig{
-		NamespaceId:    conf.NamespaceId,
-		TimeoutMs:      conf.TimeoutMs,
-		ListenInterval: conf.ListenInterval,
-		BeatInterval:   conf.BeatInterval,
-		LogDir:         conf.LogDir,
-		CacheDir:       conf.CacheDir,
-		Username:       conf.Username,
+		NamespaceId:    conf.NameSpace,
+		TimeoutMs:      10000,
+		ListenInterval: 30000,
+		BeatInterval:   5000,
+		LogDir:         "logs",
+		CacheDir:       "cache",
+		Username:       conf.UserName,
 		Password:       conf.Password,
 	}
 }
 
-func newServerConfigs(confs map[string]config.NacosServerConfig) []constant.ServerConfig {
-	host := os.Getenv("REGISTER_HOST")
-	if host == "" {
-		log.Fatal("nacos host is empty")
-		return nil
-	}
-	portStr := os.Getenv("REGISTER_PORT")
-	if portStr == "" {
-		log.Fatal("nacos port is empty")
-		return nil
-	}
-	port, err := strconv.ParseUint(portStr, 10, 64)
+func newServerConfigs(conf *config.NacosBaseConfig) []constant.ServerConfig {
+	port, err := strconv.ParseUint(conf.Port, 10, 64)
 	if err != nil {
 		log.Fatal(err)
 		return nil
 	}
 	var ss []constant.ServerConfig
-	for _, conf := range confs {
-		ss = append(ss, constant.ServerConfig{
-			IpAddr:      host,
-			Port:        port,
-			ContextPath: conf.ContextPath,
-		})
-	}
+	ss = append(ss, constant.ServerConfig{
+		IpAddr:      conf.Host,
+		Port:        port,
+		ContextPath: "/nacos",
+	})
 	return ss
 }
 
